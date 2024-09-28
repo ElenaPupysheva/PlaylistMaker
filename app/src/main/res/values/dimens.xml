@@ -12,7 +12,7 @@
     <dimen name="us_padSt">16dp</dimen>
     <dimen name="us_padEn">12dp</dimen>
     <dimen name="top_mar">24dp</dimen>
-    <dimen name="pad_vertical">21dp</dimen>
+    <dimen name="pad_vertical">20dp</dimen>
     <dimen name="pad_bottom">28dp</dimen>
 
     <dimen name="main_text_size">22sp</dimen>

@@ -10,25 +10,14 @@
     android:padding="@dimen/us_padSt"
     android:paddingBottom="@dimen/pad_bottom">
 
-    <FrameLayout
+    <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:text="@string/title"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_size" />
-    </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/top_mar"
-        android:orientation="vertical"
-        >
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        app:title="@string/title"
+        app:titleTextColor="@color/white"
+        app:contentInsetStart="0dp"
+        android:textSize="@dimen/main_text_size"/>
 
         <Button
             android:id="@+id/search_button"
@@ -37,6 +26,7 @@
             android:layout_gravity="center"
             android:textAllCaps="false"
             android:layout_marginBottom="16dp"
+            android:layout_marginTop="@dimen/top_mar"
 
             android:layout_weight="1"
             android:backgroundTint="@color/white"
@@ -92,5 +82,4 @@
             app:iconSize="@dimen/small_icon_size"
             app:iconTint="@color/black" />
 
-    </LinearLayout>
 </LinearLayout>
