@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="icon_size">48dp</dimen>
+    <dimen name="small_icon_size">24dp</dimen>
+    <dimen name="rad">16dp</dimen>
+
+    <dimen name="small_icon_pad">8dp</dimen>
+    <dimen name="main_setting_marg">4dp</dimen>
+    <dimen name="main_padSt">12dp</dimen>
+    <dimen name="main_padEn">86dp</dimen>
+    <dimen name="us_padSt">16dp</dimen>
+    <dimen name="us_padEn">12dp</dimen>
+    <dimen name="top_mar">24dp</dimen>
+    <dimen name="pad_vertical">21dp</dimen>
+    <dimen name="pad_bottom">28dp</dimen>
+
+    <dimen name="main_text_size">22sp</dimen>
+    <dimen name="usual_text_size">16sp</dimen>
+
+</resources>
