@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:theme="@style/Theme.PlaylistMaker"
+    android:background="?attr/colorSecondary"
+
    >
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -29,7 +30,8 @@
             android:paddingVertical="@dimen/pad_vertical"
             android:text="@string/dark_theme"
             android:textColor="?attr/colorOnSecondary"
-
+            app:trackTint="@color/knob_tint"
+            app:thumbTint="@color/thumb_tint"
             style="@style/SettingsMaterialTextView"/>
 
         <com.google.android.material.textview.MaterialTextView
