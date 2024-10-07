@@ -21,13 +21,19 @@
     </style>
 
     <style name="SettingsMaterialTextView">
-        <item name="colorControlActivated">#E6E8EB</item>
+
         <item name="android:textColor">?attr/colorOnSecondary</item>
         <item name="android:textSize">@dimen/usual_text_size</item>
         <item name="android:paddingStart">@dimen/us_padSt</item>
         <item name="android:paddingEnd">@dimen/us_padEn</item>
         <item name="android:paddingVertical">@dimen/pad_vertical</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+
+    <style name="CustomToolbarTitleStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>
 
 
