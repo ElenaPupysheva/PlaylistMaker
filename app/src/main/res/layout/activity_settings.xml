@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:navigationIcon="@drawable/back"
-        app:navigationIconTint="@color/white"
         app:iconGravity="textStart"
         app:title="@string/settings"
         app:titleTextColor="?attr/colorOnSecondary"
@@ -31,6 +30,7 @@
             style="@style/SettingsMaterialTextView"/>
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/appShare"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/share"
@@ -38,6 +38,7 @@
             style="@style/SettingsMaterialTextView"/>
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mailSupport"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/support"
@@ -45,6 +46,7 @@
             style="@style/SettingsMaterialTextView"/>
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/userAgreement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/forward"

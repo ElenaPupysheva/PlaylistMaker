@@ -1,11 +1,10 @@
 package com.practicum.playlistmaker
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,5 +25,35 @@ class SettingsActivity : AppCompatActivity() {
              startActivity(intent)
              finish()
         }
+
+        val appSharing = findViewById<TextView>(R.id.appShare)
+        appSharing.setOnClickListener {
+            val shareMessage = getString(R.string.link_course)
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, shareMessage)
+                type = "text/plain"
+            }
+            val chooser = Intent.createChooser(shareIntent, getString(R.string.share_text))
+            startActivity(chooser)
+        }
+
+        val mailSend = findViewById<TextView>(R.id.mailSupport)
+        mailSend.setOnClickListener {
+            val message = getString(R.string.message_text)
+            val theme = getString(R.string.theme_text)
+            val shareIntent = Intent(Intent.ACTION_SENDTO)
+            shareIntent.data = Uri.parse("mailto:")
+            shareIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.link_mail)))
+            shareIntent.putExtra(Intent.EXTRA_TEXT, message)
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, theme)
+            startActivity(shareIntent)
+         }
+        val agreementOpen = findViewById<TextView>(R.id.userAgreement)
+        agreementOpen.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.link_agreement)))
+            startActivity(browserIntent)
+        }
+
     }
 }
