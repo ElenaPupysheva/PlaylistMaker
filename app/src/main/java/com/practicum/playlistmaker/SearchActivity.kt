@@ -21,13 +21,8 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_search)
-        //ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.search)) { v, insets ->
-        //    val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        //   v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-        //   insets
-        //}
+
         if (savedInstanceState != null) {
             stringValue = savedInstanceState.getString(TEXT_AMOUNT, AMOUNT_DEF)
         }
@@ -38,7 +33,6 @@ class SearchActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
             finish()
         }
         val searchEditText = findViewById<EditText>(R.id.searchEditText)
@@ -53,7 +47,7 @@ class SearchActivity : AppCompatActivity() {
                 clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
             }
             override fun afterTextChanged(s: Editable?) {
-                //что-то в будущем
+                stringValue = s.toString()
             }
         })
 
@@ -68,7 +62,6 @@ class SearchActivity : AppCompatActivity() {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         }
-
 
     }
 
