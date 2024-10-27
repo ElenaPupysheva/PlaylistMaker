@@ -60,5 +60,21 @@
         android:background="?attr/colorSecondary"
     </style>
 
+    <style name="TrackBar">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/usual_text_size</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+    </style>
+
+    <style name="ArtistBar">
+        <item name="android:textColor">@color/knob_tint</item>
+        <item name="android:textSize">@dimen/text11sp</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
+    </style>
+
+    <style name="circleStyle">
+        <item name="android:fillColor">@color/knob_tint</item>
+    </style>
+
 
 </resources>
