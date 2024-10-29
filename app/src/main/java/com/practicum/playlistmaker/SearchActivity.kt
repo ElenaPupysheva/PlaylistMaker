@@ -25,8 +25,8 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        try {
-            super.onCreate(savedInstanceState)
+
+        super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_search)
 
             val rvTrack = findViewById<RecyclerView>(R.id.recyclerView)
@@ -82,9 +82,7 @@ class SearchActivity : AppCompatActivity() {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
             }
-        } catch (e: Exception) {
-            Log.e("SearchActivity", "Error initializing activity", e)
-        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

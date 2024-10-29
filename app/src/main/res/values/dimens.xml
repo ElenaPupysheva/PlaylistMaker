@@ -7,6 +7,7 @@
 
     <dimen name="small_icon_pad">8dp</dimen>
     <dimen name="size_2dp">2dp</dimen>
+    <dimen name="size_4dp">4dp</dimen>
     <dimen name="size_14dp">14dp</dimen>
     <dimen name="main_setting_marg">4dp</dimen>
     <dimen name="main_padSt">12dp</dimen>

@@ -41,7 +41,7 @@
         <item name="android:background">@drawable/search_rounded</item>
         <item name="android:paddingHorizontal">@dimen/us_padSt</item>
         <item name="cornerRadius">@dimen/small_icon_pad</item>
-        <item name="android:drawablePadding">@dimen/size_2dp</item>
+        <item name="android:drawablePadding">@dimen/small_icon_pad</item>
         <item name="android:drawableStart">@drawable/search_bar_icon</item>
         <item name="android:drawableTint">#FFAEAFB4</item>
         <item name="android:layout_gravity">center_vertical</item>
@@ -74,6 +74,11 @@
 
     <style name="circleStyle">
         <item name="android:fillColor">@color/knob_tint</item>
+    </style>
+
+    <style name="ShapeCornerSize2dp">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/size_2dp</item>
     </style>
 
 
