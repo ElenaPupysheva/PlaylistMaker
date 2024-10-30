@@ -69,6 +69,6 @@
         android:layout_height="@dimen/small_icon_size"
         android:layout_gravity="center"
         android:layout_marginEnd="@dimen/us_padEn"
-        android:background="@drawable/forward" />
+        android:background="@drawable/forward_track" />
 
 </LinearLayout>
