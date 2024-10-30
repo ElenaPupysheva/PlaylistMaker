@@ -22,10 +22,7 @@ class SearchActivity : AppCompatActivity() {
 
     private var stringValue: String = AMOUNT_DEF
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_search)
 
