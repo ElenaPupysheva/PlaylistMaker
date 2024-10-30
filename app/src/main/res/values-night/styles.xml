@@ -43,7 +43,7 @@
         <item name="android:backgroundTint">#FFFFFF</item>
         <item name="android:paddingHorizontal">@dimen/us_padSt</item>
         <item name="cornerRadius">@dimen/small_icon_pad</item>
-        <item name="android:drawablePadding">@dimen/size_2dp</item>
+        <item name="android:drawablePadding">@dimen/small_icon_pad</item>
         <item name="android:drawableStart">@drawable/search_bar_icon</item>
         <item name="android:drawableTint">#1A1B22</item>
         <item name="android:layout_gravity">center_vertical</item>
