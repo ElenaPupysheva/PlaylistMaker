@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="61dp"
+    android:orientation="horizontal"
+    android:paddingVertical="@dimen/small_icon_pad"
+    android:paddingStart="@dimen/size_13dp"
+    tools:ignore="RtlSymmetry">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/trackImg"
+        android:layout_width="@dimen/size_45dp"
+        android:layout_height="@dimen/size_45dp"
+        android:src="@drawable/placeholder"
+        app:shapeAppearanceOverlay="@style/ShapeCornerSize2dp" />
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_icon_pad"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/trackName"
+            style="@style/TrackBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/size_6dp"
+            tools:text="Music name" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/main_setting_marg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/artistName"
+                style="@style/ArtistBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Artist Name" />
+
+            <ImageView
+                android:id="@+id/circle"
+                android:layout_width="@dimen/size_13dp"
+                android:layout_height="@dimen/size_13dp"
+                android:gravity="center_vertical"
+                android:src="@drawable/ic" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/trackTime"
+                style="@style/ArtistBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                tools:text="3:45" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/arrowForward"
+        android:layout_width="@dimen/small_icon_size"
+        android:layout_height="@dimen/small_icon_size"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/us_padEn"
+        android:background="@drawable/forward_track" />
+
+</LinearLayout>

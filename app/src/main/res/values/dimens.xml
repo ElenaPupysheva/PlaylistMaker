@@ -7,6 +7,7 @@
 
     <dimen name="small_icon_pad">8dp</dimen>
     <dimen name="size_2dp">2dp</dimen>
+    <dimen name="size_4dp">4dp</dimen>
     <dimen name="size_14dp">14dp</dimen>
     <dimen name="main_setting_marg">4dp</dimen>
     <dimen name="main_padSt">12dp</dimen>
@@ -18,8 +19,14 @@
     <dimen name="pad_bottom">28dp</dimen>
     <dimen name="size_36dp">36dp</dimen>
     <dimen name="size_52dp">52dp</dimen>
+    <dimen name="lil_margin">3dp</dimen>
+    <dimen name="size_13dp">13dp</dimen>
+    <dimen name="size_6dp">6dp</dimen>
+    <dimen name="size_0dp">0dp</dimen>
+    <dimen name="size_45dp">45dp</dimen>
 
     <dimen name="main_text_size">22sp</dimen>
     <dimen name="usual_text_size">16sp</dimen>
+    <dimen name="text11sp">11sp</dimen>
 
 </resources>
