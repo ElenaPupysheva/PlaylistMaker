@@ -1,7 +1,7 @@
 package com.practicum.playlistmaker
 
 object TrackList {
-    private val tracks = listOf<Track>(
+    private val tracks = mutableListOf<Track>(
         Track(
             trackName = "Smells Like Teen Spirit",
             artistName = "Nirvana",
