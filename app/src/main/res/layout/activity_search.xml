@@ -37,8 +37,9 @@
             android:imeOptions="actionDone"
             android:inputType="textCapSentences"
             android:lines="1"
-            android:singleLine="true"
+            android:maxLines="1"
             tools:ignore="TouchTargetSizeCheck" />
+
 
         <ImageView
             android:id="@+id/clearIcon"
@@ -62,10 +63,10 @@
         android:layout_marginTop="102dp">
 
         <ImageView
+            style="@style/errorNight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/error_search"
             android:contentDescription="@string/nothing_found" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -86,10 +87,10 @@
         android:layout_marginTop="102dp">
 
         <ImageView
+            style="@style/errorNetNight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/error_net_light"
             android:contentDescription="@string/error_net" />
 
         <com.google.android.material.textview.MaterialTextView

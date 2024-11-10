@@ -97,7 +97,15 @@ class SearchActivity : AppCompatActivity() {
         }
         queryInput = searchEditText
         fun performSearch(query: String) {
-            lastSearchQuery = query // Сохраняем последний поисковый запрос
+            if (query.isBlank()) return // Игнорируем пустой запрос
+
+            lastSearchQuery = query // Сохраняем последний запрос
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(queryInput.windowToken, 0) // Скрываем клавиатуру
+
+            trackList.clear() // Очищаем список перед новым поиском
+            trackAdapter.notifyDataSetChanged()
+
             trackApiService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
                 override fun onResponse(
                     call: Call<TrackResponse>,
@@ -105,23 +113,24 @@ class SearchActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful) {
                         val responseBody = response.body()
-                        if (responseBody == null || responseBody.resultCount == 0) {
-                            errorView.visibility = View.VISIBLE
-                            errorNet.visibility = View.GONE
-                        } else {
+                        if (responseBody != null && responseBody.resultCount > 0) {
                             trackList.addAll(responseBody.results)
                             errorNet.visibility = View.GONE
                             errorView.visibility = View.GONE
+                        } else {
+                            errorView.visibility = View.VISIBLE
+                            errorNet.visibility = View.GONE
                         }
                     } else {
-                        errorView.visibility = View.GONE
                         errorNet.visibility = View.VISIBLE
+                        errorView.visibility = View.GONE
                     }
+                    trackAdapter.notifyDataSetChanged() // Уведомляем адаптер об изменениях
                 }
 
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    errorView.visibility = View.GONE
                     errorNet.visibility = View.VISIBLE
+                    errorView.visibility = View.GONE
                 }
             })
         }

@@ -87,8 +87,6 @@
         <item name="android:lineHeight">22.27dp</item>
         <item name="android:textSize">@dimen/text19sp</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
-
-
     </style>
 
     <style name="errorNetTextStyle">
@@ -112,6 +110,14 @@
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">@dimen/text14sp</item>
 
+    </style>
+
+    <style name="errorNetNight">
+        <item name="android:src">@drawable/error_net_light</item>
+    </style>
+
+    <style name="errorNight">
+        <item name="android:src">@drawable/error_search</item>
     </style>
 
 </resources>
