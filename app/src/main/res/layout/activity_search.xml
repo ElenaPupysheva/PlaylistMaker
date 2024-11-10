@@ -65,7 +65,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/error_search" />
+            android:src="@drawable/error_search"
+            android:contentDescription="@string/nothing_found" />
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/errorTextStyle"
@@ -88,7 +89,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/error_net_light" />
+            android:src="@drawable/error_net_light"
+            android:contentDescription="@string/error_net" />
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/errorNetTextStyle"
@@ -112,8 +114,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/us_padSt"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/track_list_view"
-        android:visibility="gone" />
+        tools:listitem="@layout/track_list_view" />
 
 
 </LinearLayout>

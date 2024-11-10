@@ -78,10 +78,11 @@ class SearchActivity : AppCompatActivity() {
             }
         })
 
-        searchEditText.setOnClickListener {
-            searchEditText.requestFocus() // Запрашиваем фокус
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
+            }
         }
 
         clearIcon.setOnClickListener {
@@ -104,13 +105,11 @@ class SearchActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful) {
                         val responseBody = response.body()
-
-                        if (responseBody!!.resultCount == 0) {
+                        if (responseBody == null || responseBody.resultCount == 0) {
                             errorView.visibility = View.VISIBLE
                             errorNet.visibility = View.GONE
-
                         } else {
-                            trackList.addAll(responseBody!!.results)
+                            trackList.addAll(responseBody.results)
                             errorNet.visibility = View.GONE
                             errorView.visibility = View.GONE
                         }
@@ -131,8 +130,9 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 performSearch(queryInput.text.toString())
                 true
+            } else {
+                false
             }
-            false
         }
 
         refreshButton.setOnClickListener {
