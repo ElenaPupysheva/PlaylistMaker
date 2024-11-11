@@ -26,13 +26,14 @@ class SearchActivity : AppCompatActivity() {
     private var stringValue: String = AMOUNT_DEF
     private var lastSearchQuery: String = ""
 
+    private val urlMusic: String = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com")
+        .baseUrl(urlMusic)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
     private val trackApiService = retrofit.create(TrackApiService::class.java)
-    val trackList = TrackList.getTracks()
+    val trackList: MutableList<Track> = mutableListOf()
     val trackAdapter = TrackAdapter(trackList)
 
 
@@ -53,11 +54,16 @@ class SearchActivity : AppCompatActivity() {
         rvTrack.layoutManager = LinearLayoutManager(this)
         rvTrack.adapter = trackAdapter
 
+        trackList.clear()
+        searchEditText.text.clear()
+        clearIcon.visibility = View.GONE
+        errorNet.visibility = View.GONE
+        errorView.visibility = View.GONE
+        trackAdapter.notifyDataSetChanged()
+
         if (savedInstanceState != null) {
             stringValue = savedInstanceState.getString(TEXT_AMOUNT, AMOUNT_DEF)
         }
-
-
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -97,13 +103,13 @@ class SearchActivity : AppCompatActivity() {
         }
         queryInput = searchEditText
         fun performSearch(query: String) {
-            if (query.isBlank()) return // Игнорируем пустой запрос
+            if (query.isBlank()) return
 
-            lastSearchQuery = query // Сохраняем последний запрос
+            lastSearchQuery = query
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(queryInput.windowToken, 0) // Скрываем клавиатуру
+            imm.hideSoftInputFromWindow(queryInput.windowToken, 0)
 
-            trackList.clear() // Очищаем список перед новым поиском
+            trackList.clear()
             trackAdapter.notifyDataSetChanged()
 
             trackApiService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
@@ -125,7 +131,7 @@ class SearchActivity : AppCompatActivity() {
                         errorNet.visibility = View.VISIBLE
                         errorView.visibility = View.GONE
                     }
-                    trackAdapter.notifyDataSetChanged() // Уведомляем адаптер об изменениях
+                    trackAdapter.notifyDataSetChanged()
                 }
 
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
