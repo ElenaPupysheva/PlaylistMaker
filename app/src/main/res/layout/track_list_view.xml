@@ -30,7 +30,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/size_6dp"
-            tools:text="Music name" />
+            tools:text="Music name"
+            android:ellipsize="end"
+            android:maxLines="1" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -43,8 +45,9 @@
                 android:id="@+id/artistName"
                 style="@style/ArtistBar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Artist Name" />
+                android:layout_height="match_parent"
+                android:maxWidth="200dp"
+                tools:text="Artist NameArtist NameArtist NameArtist NameArtist NameArtist NameArtist Name" />
 
             <ImageView
                 android:id="@+id/circle"

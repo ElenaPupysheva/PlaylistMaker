@@ -16,5 +16,8 @@
     <string name="share_text">Поделиться приложением через</string>
     <string name="link_course">https://practicum.yandex.ru/profile/android-developer-plus/</string>
 
+    <string name="nothing_found">Ничего не нашлось</string>
+    <string name="error_net">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="error_refresh">Обновить</string>
 
     </resources>

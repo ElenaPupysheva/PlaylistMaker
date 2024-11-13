@@ -34,8 +34,12 @@
             android:autofillHints="no"
             android:contextClickable="true"
             android:hint="@string/search"
+            android:imeOptions="actionDone"
             android:inputType="textCapSentences"
-            android:lines="1" />
+            android:lines="1"
+            android:maxLines="1"
+            tools:ignore="TouchTargetSizeCheck" />
+
 
         <ImageView
             android:id="@+id/clearIcon"
@@ -49,6 +53,62 @@
             />
     </FrameLayout>
 
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/errorView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="102dp">
+
+        <ImageView
+            style="@style/errorNight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="@string/nothing_found" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/errorTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:text="@string/nothing_found" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/errorNet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="102dp">
+
+        <ImageView
+            style="@style/errorNetNight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="@string/error_net" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/errorNetTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_net" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/errorNetButtonStyle"
+            android:id="@+id/refreshButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/error_refresh" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -56,4 +116,6 @@
         android:layout_marginTop="@dimen/us_padSt"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/track_list_view" />
+
+
 </LinearLayout>

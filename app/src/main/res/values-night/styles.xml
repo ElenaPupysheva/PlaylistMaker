@@ -78,4 +78,24 @@
     <style name="circleStyle">
         <item name="android:fillColor">@color/white</item>
     </style>
+
+    <style name="errorNetButtonStyle">
+        <item name="cornerRadius">54dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">@dimen/text14sp</item>
+        <item name="android:textColor">@color/all_txt</item>
+
+    </style>
+
+    <style name="errorNetNight">
+        <item name="android:src">@drawable/error_net_night</item>
+    </style>
+
+    <style name="errorNight">
+        <item name="android:src">@drawable/error_search_night</item>
+    </style>
 </resources>

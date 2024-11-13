@@ -27,6 +27,8 @@
 
     <dimen name="main_text_size">22sp</dimen>
     <dimen name="usual_text_size">16sp</dimen>
+    <dimen name="text19sp">19sp</dimen>
     <dimen name="text11sp">11sp</dimen>
+    <dimen name="text14sp">14sp</dimen>
 
 </resources>
