@@ -1,15 +1,13 @@
 package com.practicum.playlistmaker
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-const val PRACTICUM_PREFERENCES = "practicum_preferences"
-const val SWITCH_KEY = "dark_theme"
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,16 +23,17 @@ class SettingsActivity : AppCompatActivity() {
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
         themeSwitcher.isChecked = isDarkTheme
 
-        themeSwitcher.setOnCheckedChangeListener { switcher, isChecked ->
+        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
             (applicationContext as App).switchTheme(isChecked)
+            sharedPrefs.edit().putBoolean(SWITCH_KEY, isChecked).apply()
         }
 
         // Enable the navigation icon (back button)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener {
-             val intent = Intent(this, MainActivity::class.java)
-             startActivity(intent)
-             finish()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
         val appSharing = findViewById<TextView>(R.id.appShare)
@@ -59,12 +58,12 @@ class SettingsActivity : AppCompatActivity() {
             shareIntent.putExtra(Intent.EXTRA_TEXT, message)
             shareIntent.putExtra(Intent.EXTRA_SUBJECT, theme)
             startActivity(shareIntent)
-         }
+        }
+
         val agreementOpen = findViewById<TextView>(R.id.userAgreement)
         agreementOpen.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.link_agreement)))
             startActivity(browserIntent)
         }
-
     }
 }
