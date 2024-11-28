@@ -115,28 +115,33 @@
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/youSearchStyle"
+            android:id="@+id/youSearch"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/you_search" />
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/us_padSt"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/track_list_view" />
+
+        </ScrollView>
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/SearchClearButtonStyle"
+            android:id="@+id/clearSearchButton"
+            android:layout_marginBottom="16dp"
+            android:text="@string/history_clear" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/us_padSt"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/track_list_view" />
-
-    <com.google.android.material.button.MaterialButton
-        style="@style/SearchClearButtonStyle"
-        android:id="@+id/clearSearchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/history_clear"
-        android:visibility="gone" />
 
 </LinearLayout>

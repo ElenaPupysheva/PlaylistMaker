@@ -19,7 +19,6 @@ class SettingsActivity : AppCompatActivity() {
 
         val sharedPrefs = getSharedPreferences(PRACTICUM_PREFERENCES, MODE_PRIVATE)
         val isDarkTheme = sharedPrefs.getBoolean(SWITCH_KEY, false)
-
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
         themeSwitcher.isChecked = isDarkTheme
 

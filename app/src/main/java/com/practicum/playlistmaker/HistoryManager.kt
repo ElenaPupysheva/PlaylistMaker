@@ -32,10 +32,10 @@ class HistoryManager {
     fun add(track: Track) {
         val history = getHistory().toMutableList()
         history.removeAll { it.trackId == track.trackId }
+        history.add(0, track)
         if (history.size > MAX_HISTORY_SIZE) {
             history.removeLast()
         }
-        history.add(0, track)
         setHistory(history)
     }
 

@@ -8,9 +8,14 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val sharedPrefs = getSharedPreferences(/* name = */ PRACTICUM_PREFERENCES, /* mode = */
-            MODE_PRIVATE
-        )
+        val sharedPrefs = getSharedPreferences(PRACTICUM_PREFERENCES, MODE_PRIVATE)
+
+        if (!sharedPrefs.contains(SWITCH_KEY)) {
+            val isSystemDarkTheme = resources.configuration.uiMode and
+                    android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            sharedPrefs.edit().putBoolean(SWITCH_KEY, isSystemDarkTheme).apply()
+        }
+
         darkTheme = sharedPrefs.getBoolean(SWITCH_KEY, false)
 
         AppCompatDelegate.setDefaultNightMode(
