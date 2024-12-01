@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,17 +37,14 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
     private val trackApiService = retrofit.create(TrackApiService::class.java)
     val trackList: MutableList<Track> = mutableListOf()
     val trackAdapter = TrackAdapter(trackList)
-    var historyTrackList: MutableList<Track> = mutableListOf()
-    val historyAdapter = TrackAdapter(historyTrackList)
+    val historyList: MutableList<Track> = mutableListOf()
+    val historyAdapter = TrackAdapter(historyList)
     val historyManager = HistoryManager()
-
-
     private lateinit var queryInput: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-
         val rvTrack = findViewById<RecyclerView>(R.id.recyclerView)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
 
@@ -54,25 +52,24 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         val clearIcon = findViewById<ImageView>(R.id.clearIcon)
         val errorNet = findViewById<LinearLayout>(R.id.errorNet)
         val errorView = findViewById<LinearLayout>(R.id.errorView)
-        val histView = findViewById<LinearLayout>(R.id.historyView)
         val refreshButton = findViewById<MaterialButton>(R.id.refreshButton)
-        val clearHistoryButton = findViewById<MaterialButton>(R.id.clearSearchButton)
-        val youSearch = findViewById<MaterialTextView>(R.id.youSearch)
+        val historyView = findViewById<LinearLayout>(R.id.historyView)
+        val clearHistoryButton = findViewById<MaterialButton>(R.id.clearSearch)
+        val searchTitle = findViewById<MaterialTextView>(R.id.you_Search)
 
         rvTrack.layoutManager = LinearLayoutManager(this)
         rvTrack.adapter = trackAdapter
 
         historyManager.init(getSharedPreferences("SEARCH_HISTORY", MODE_PRIVATE))
-        historyTrackList.addAll(historyManager.getHistory())
+        historyList.addAll(historyManager.getHistory())
 
         trackList.clear()
         searchEditText.text.clear()
         clearIcon.visibility = View.GONE
         errorNet.visibility = View.GONE
         errorView.visibility = View.GONE
-        histView.visibility = View.GONE
+        historyView.visibility = View.GONE
         clearHistoryButton.visibility = View.GONE
-        youSearch.visibility = View.GONE
         trackAdapter.notifyDataSetChanged()
 
         trackAdapter.setOnTrackClickListener(this)
@@ -81,38 +78,40 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         if (savedInstanceState != null) {
             stringValue = savedInstanceState.getString(TEXT_AMOUNT, AMOUNT_DEF)
         }
+        setSupportActionBar(toolbar)
 
-        setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        findViewById<Toolbar>(R.id.toolbar).setNavigationOnClickListener {
+        toolbar.setNavigationOnClickListener {
             finish()
         }
 
         searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
 
                 if (s.isNullOrEmpty() && searchEditText.hasFocus()) {
-                    historyTrackList.clear()
-                    historyTrackList.addAll(historyManager.getHistory())
+                    historyList.clear()
+                    historyList.addAll(historyManager.getHistory())
                     rvTrack.adapter = historyAdapter
-                    historyAdapter.updateTracks(historyTrackList)
+                    historyAdapter.updateTracks(historyList)
 
-                    if (historyTrackList.isNotEmpty()) {
-                        histView.visibility = View.VISIBLE
+                    if (historyList.isNotEmpty()) {
+                        historyView.visibility = View.VISIBLE
                         clearHistoryButton.visibility = View.VISIBLE
-                        youSearch.visibility = View.GONE
+
                     } else {
-                        histView.visibility = View.GONE
+                        historyView.visibility = View.GONE
                         clearHistoryButton.visibility = View.GONE
-                        youSearch.visibility = View.GONE
+
                     }
                 } else {
-                    histView.visibility = View.GONE
+                    historyView.visibility = View.GONE
                     clearHistoryButton.visibility = View.GONE
-                    youSearch.visibility = View.GONE
+                    rvTrack.adapter = trackAdapter
+
                 }
 
             }
@@ -123,55 +122,60 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         })
 
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && searchEditText.text.isEmpty()) {
-                historyTrackList.clear()
-                historyTrackList.addAll(historyManager.getHistory())
-                rvTrack.adapter = historyAdapter
-                historyAdapter.updateTracks(historyTrackList)
+            if (hasFocus) {
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
 
-                if (historyTrackList.isNotEmpty()) {
-                    histView.visibility = View.VISIBLE
+            if (hasFocus && searchEditText.text.isEmpty()) {
+                historyList.clear()
+                historyList.addAll(historyManager.getHistory())
+                rvTrack.adapter = historyAdapter
+                historyAdapter.updateTracks(historyList)
+
+                if (historyList.isNotEmpty()) {
+                    historyView.visibility = View.GONE
                     clearHistoryButton.visibility = View.VISIBLE
-                    youSearch.visibility = View.GONE
+
                 } else {
-                    histView.visibility = View.GONE
+                    historyView.visibility = View.GONE
                     clearHistoryButton.visibility = View.GONE
-                    youSearch.visibility = View.GONE
+
                 }
             } else {
-                histView.visibility = View.GONE
+                historyView.visibility = View.GONE
                 clearHistoryButton.visibility = View.GONE
-                youSearch.visibility = View.GONE
+
             }
         }
 
         clearIcon.setOnClickListener {
-            searchEditText.text.clear()
+            queryInput.text.clear()
             clearIcon.visibility = View.GONE
-            errorNet.visibility = View.GONE
-            errorView.visibility = View.GONE
             trackList.clear()
-            trackAdapter.notifyDataSetChanged()
+            trackAdapter.updateTracks(trackList)
 
-            historyTrackList.clear()
-            historyTrackList.addAll(historyManager.getHistory())
-
-            if (historyTrackList.isNotEmpty()) {
-                histView.visibility = View.VISIBLE
+            historyList.clear()
+            historyList.addAll(historyManager.getHistory())
+            if (historyList.isNotEmpty()) {
+                historyView.visibility = View.VISIBLE
                 clearHistoryButton.visibility = View.VISIBLE
-                youSearch.visibility = View.VISIBLE
+                searchTitle.visibility = View.VISIBLE
                 rvTrack.adapter = historyAdapter
-                historyAdapter.updateTracks(historyTrackList)
+                historyAdapter.updateTracks(historyList)
             } else {
-                histView.visibility = View.GONE
+                historyView.visibility = View.GONE
                 clearHistoryButton.visibility = View.GONE
-                youSearch.visibility = View.GONE
             }
 
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-            searchEditText.clearFocus()
+
         }
+
+
 
         queryInput = searchEditText
         fun performSearch(query: String) {
@@ -217,7 +221,6 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 performSearch(queryInput.text.toString())
-                queryInput.clearFocus()
                 true
             } else {
                 false
@@ -228,22 +231,22 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             queryInput.setText(lastSearchQuery)
             performSearch(lastSearchQuery)
         }
-
         clearHistoryButton.setOnClickListener {
             historyManager.clearHistory()
-            historyTrackList.clear()
-            historyAdapter.updateTracks(historyTrackList)
-            histView.visibility = View.GONE
+            historyList.clear()
+            historyAdapter.updateTracks(historyList)
+            historyView.visibility = View.GONE
             clearHistoryButton.visibility = View.GONE
-            youSearch.visibility = View.GONE
+
         }
+
     }
 
     override fun onTrackClick(track: Track) {
         historyManager.add(track)
-        historyTrackList.clear()
-        historyTrackList.addAll(historyManager.getHistory())
-        historyAdapter.updateTracks(historyTrackList)
+        historyList.clear()
+        historyList.addAll(historyManager.getHistory())
+        historyAdapter.updateTracks(historyList)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
