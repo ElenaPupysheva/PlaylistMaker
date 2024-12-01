@@ -57,7 +57,7 @@
     </style>
 
     <style name="ScreenParam">
-        android:background="?attr/colorSecondary"
+        android:background="@color/changeMode"
     </style>
 
     <style name="TrackBar">

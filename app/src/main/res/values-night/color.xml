@@ -5,6 +5,7 @@
     <color name="night_back">#1A1B22</color>
     <color name="ic_knob">#3772E7</color>
     <color name="ic_track">#9FBBF3</color>
+    <color name="changeMode">#1A1B22</color>
 
 
 </resources>
