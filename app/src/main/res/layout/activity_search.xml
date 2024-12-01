@@ -123,7 +123,6 @@
 
     </LinearLayout>
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -131,12 +130,13 @@
         android:layout_marginTop="@dimen/us_padSt"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/clearSearch"
         style="@style/SearchClearButtonStyle"
         android:text="@string/history_clear"
         android:layout_marginBottom="16dp"
-        android:layout_marginTop="24dp"
         android:visibility="gone" />
+
 
 </LinearLayout>
