@@ -29,6 +29,7 @@
             style="@style/TrackBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:layout_marginTop="@dimen/size_6dp"
             tools:text="Music name"
             android:ellipsize="end"
@@ -44,9 +45,9 @@
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/artistName"
                 style="@style/ArtistBar"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:maxWidth="200dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 tools:text="Artist NameArtist NameArtist NameArtist NameArtist NameArtist NameArtist Name" />
 
             <ImageView
