@@ -22,7 +22,6 @@
     </style>
 
     <style name="SettingsMaterialTextView">
-
         <item name="android:textColor">?attr/colorOnSecondary</item>
         <item name="android:textSize">@dimen/usual_text_size</item>
         <item name="android:paddingStart">@dimen/us_padSt</item>
@@ -35,6 +34,7 @@
         <item name="android:textSize">22sp</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:color">@color/toolBar</item>
     </style>
 
     <style name="SearchBar">
@@ -57,7 +57,11 @@
     </style>
 
     <style name="ScreenParam">
-        android:background="@color/changeMode"
+        <item name="android:background">@color/changeMode</item>
+    </style>
+
+    <style name="MainScreenParam">
+        <item name="android:background">@color/main_background</item>
     </style>
 
     <style name="TrackBar">

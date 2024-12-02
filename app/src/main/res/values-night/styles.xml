@@ -55,7 +55,11 @@
     </style>
 
     <style name="ScreenParam">
-        android:background="?attr/colorSecondary"
+        <item name="android:background">@color/changeMode</item>
+    </style>
+
+    <style name="MainScreenParam">
+        <item name="android:background">@color/main_background</item>
     </style>
 
     <style name="IconClear">
