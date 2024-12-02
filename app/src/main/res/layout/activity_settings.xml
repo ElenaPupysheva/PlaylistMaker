@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSecondary"
+    style="@style/ScreenParam"
    >
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -19,6 +19,8 @@
         />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/themeSwitcher"
+            style="@style/SettingsMaterialTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -26,8 +28,8 @@
             android:paddingVertical="@dimen/pad_vertical"
             android:text="@string/dark_theme"
             android:textColor="?attr/colorOnSecondary"
-
-            style="@style/SettingsMaterialTextView"/>
+            app:thumbTint="@color/ic_knob"
+            app:trackTint="@color/ic_track" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/appShare"
