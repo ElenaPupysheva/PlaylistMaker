@@ -35,9 +35,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/musicTrackCover"
-        style="@style/albumCover"
-        android:layout_width="312dp"
-        android:layout_height="312dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="@dimen/mar_26dp"
         android:contentDescription="@string/albumCover"
         android:scaleType="centerCrop"
@@ -91,7 +90,6 @@
         android:id="@+id/addButton"
         android:layout_width="51dp"
         android:layout_height="51dp"
-        android:layout_marginTop="30dp"
         android:contentDescription="@string/add_music"
         app:layout_constraintBottom_toBottomOf="@id/playButton"
         app:layout_constraintStart_toStartOf="@id/End_guideline"
@@ -113,14 +111,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="16dp" />
+        app:layout_constraintGuide_begin="@dimen/us_padSt" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_right_16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="16dp" />
+        app:layout_constraintGuide_end="@dimen/us_padSt" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/infoBarrier"
@@ -134,7 +132,7 @@
         style="@style/playerStyleDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/us_padSt"
         app:layout_constraintEnd_toEndOf="@id/Start_guideline"
         app:layout_constraintStart_toStartOf="@id/End_guideline"
         app:layout_constraintTop_toBottomOf="@id/playButton"
@@ -143,7 +141,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/musicDuration"
         style="@style/playerStyleText"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/top_mar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/duration"
@@ -159,10 +157,17 @@
         app:layout_constraintEnd_toEndOf="@id/guideline_right_16"
         tools:text="5:35" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="musicAlbum,albumName"
+        android:visibility="visible" />
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/musicAlbum"
         style="@style/playerStyleText"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/top_mar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/album"
@@ -181,7 +186,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/musicYear"
         style="@style/playerStyleText"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/top_mar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/year"
@@ -202,7 +207,7 @@
         style="@style/playerStyleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/top_mar"
         android:text="@string/genre"
         app:layout_constraintStart_toStartOf="@id/guideline_left_16"
         app:layout_constraintTop_toBottomOf="@id/musicYear" />
@@ -222,7 +227,7 @@
         style="@style/playerStyleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/top_mar"
         android:text="@string/country"
         app:layout_constraintStart_toStartOf="@id/guideline_left_16"
         app:layout_constraintTop_toBottomOf="@id/musicGenre" />

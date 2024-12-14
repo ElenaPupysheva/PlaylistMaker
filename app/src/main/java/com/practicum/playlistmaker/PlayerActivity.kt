@@ -6,11 +6,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.Group
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
-import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -26,6 +25,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var yearName: TextView
     private lateinit var genreName: TextView
     private lateinit var countryName: TextView
+    private lateinit var group: Group
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +41,7 @@ class PlayerActivity : AppCompatActivity() {
         yearName = findViewById(R.id.yearName)
         genreName = findViewById(R.id.genreName)
         countryName = findViewById(R.id.countryName)
+        group = findViewById(R.id.group)
 
         toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -55,12 +56,12 @@ class PlayerActivity : AppCompatActivity() {
 
         trackName.text = track.trackName
         groupName.text = track.artistName
-        timeDuration.text =
+        durationText.text =
             SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
-        durationText.text = timeDuration.text
+        timeDuration.text = """00:00"""
 
         if (track.collectionName.isNullOrEmpty()) {
-            albumName.visibility = View.GONE
+            group.visibility = View.GONE
         } else {
             albumName.text = track.collectionName
         }
