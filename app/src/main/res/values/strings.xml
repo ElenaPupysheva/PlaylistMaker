@@ -21,5 +21,14 @@
     <string name="error_refresh">Обновить</string>
     <string name="you_search">Вы искали</string>
     <string name="history_clear">Очистить историю</string>
+    <string name="albumCover">Обложка песни</string>
+    <string name="play_music">Проиграть песню</string>
+    <string name="add_music">Добавить песню</string>
+    <string name="like_music">Добавить в любимое</string>
+    <string name="duration">Длительность</string>
+    <string name="album">Альбом</string>
+    <string name="year">Год</string>
+    <string name="genre">Жанр</string>
+    <string name="country">Страна</string>
 
     </resources>

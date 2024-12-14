@@ -15,6 +15,7 @@
     <dimen name="us_padSt">16dp</dimen>
     <dimen name="us_padEn">12dp</dimen>
     <dimen name="top_mar">24dp</dimen>
+    <dimen name="mar_26dp">26dp</dimen>
     <dimen name="pad_vertical">20dp</dimen>
     <dimen name="pad_bottom">28dp</dimen>
     <dimen name="size_36dp">36dp</dimen>

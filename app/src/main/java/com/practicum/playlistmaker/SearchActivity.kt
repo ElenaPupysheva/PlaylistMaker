@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,8 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.PlayerActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -247,6 +250,12 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         historyList.clear()
         historyList.addAll(historyManager.getHistory())
         historyAdapter.updateTracks(historyList)
+
+        val intent = Intent(this, PlayerActivity::class.java)
+        val jsonTrack = Gson().toJson(track)
+        intent.putExtra("track", jsonTrack)
+
+        startActivity(intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

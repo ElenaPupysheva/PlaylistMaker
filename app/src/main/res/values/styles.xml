@@ -152,4 +152,49 @@
         <item name="android:src">@drawable/error_search</item>
     </style>
 
+    <style name="albumCover">
+
+    </style>
+
+    <style name="musicTrackName">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">@dimen/main_text_size</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:fontWeight">400</item>
+    </style>
+
+    <style name="groupTrackName">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">@dimen/text14sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:fontWeight">400</item>
+    </style>
+
+    <style name="RoundedImageStyle" parent="Widget.MaterialComponents.ShapeableImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/small_icon_pad</item>
+    </style>
+
+    <style name="playerStyleDuration">
+        <item name="android:textColor">@color/all_txt</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:fontWeight">500</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="playerStyleText">
+        <item name="android:textColor">@color/playerColorText</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="playerStyleTextPlus">
+        <item name="android:textColor">@color/all_txt</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+
 </resources>
