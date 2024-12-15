@@ -117,4 +117,11 @@
     <style name="errorNight">
         <item name="android:src">@drawable/error_search_night</item>
     </style>
+
+    <style name="playerStyleTextPlus">
+        <item name="android:textColor">@color/textplus</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:textSize">13sp</item>
+    </style>
 </resources>
