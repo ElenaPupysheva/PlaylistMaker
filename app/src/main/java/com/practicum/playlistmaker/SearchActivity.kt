@@ -253,7 +253,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
         val intent = Intent(this, PlayerActivity::class.java)
         val jsonTrack = Gson().toJson(track)
-        intent.putExtra("track", jsonTrack)
+        intent.putExtra(EXTRA_TRACK, jsonTrack)
 
         startActivity(intent)
     }

@@ -27,6 +27,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var countryName: TextView
     private lateinit var group: Group
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
@@ -47,7 +48,7 @@ class PlayerActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        val jsonTrack = intent.getStringExtra("track")
+        val jsonTrack = intent.getStringExtra(EXTRA_TRACK)
         val track = Gson().fromJson(jsonTrack, Track::class.java)
         if (jsonTrack == null) {
             finish()
