@@ -13,12 +13,11 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.PlayerActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
@@ -50,6 +49,9 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
     private lateinit var errorNet: LinearLayout
     private lateinit var errorView: LinearLayout
     private lateinit var rvTrack: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var clearHistoryButton: MaterialButton
+    private lateinit var searchTitle: MaterialTextView
     private var currentQuery: String = ""
 
 
@@ -63,10 +65,11 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         val clearIcon = findViewById<ImageView>(R.id.clearIcon)
         errorNet = findViewById(R.id.errorNet)
         errorView = findViewById(R.id.errorView)
+        progressBar = findViewById(R.id.progressBar)
         val refreshButton = findViewById<MaterialButton>(R.id.refreshButton)
         val historyView = findViewById<LinearLayout>(R.id.historyView)
-        val clearHistoryButton = findViewById<MaterialButton>(R.id.clearSearch)
-        val searchTitle = findViewById<MaterialTextView>(R.id.you_Search)
+        clearHistoryButton = findViewById(R.id.clearSearch)
+        searchTitle = findViewById(R.id.you_Search)
 
         rvTrack.layoutManager = LinearLayoutManager(this)
         rvTrack.adapter = trackAdapter
@@ -197,6 +200,13 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(queryInput.windowToken, 0)
 
+        progressBar.visibility = View.VISIBLE
+        errorNet.visibility = View.GONE
+        errorView.visibility = View.GONE
+        rvTrack.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
+        searchTitle.visibility = View.GONE
+
         trackList.clear()
         trackAdapter.notifyDataSetChanged()
 
@@ -205,6 +215,8 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
                 call: Call<TrackResponse>,
                 response: Response<TrackResponse>
             ) {
+                progressBar.visibility = View.GONE
+                rvTrack.visibility = View.VISIBLE
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null && responseBody.resultCount > 0) {
@@ -224,6 +236,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             }
 
             override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                progressBar.visibility = View.GONE
                 errorNet.visibility = View.VISIBLE
                 errorView.visibility = View.GONE
             }
