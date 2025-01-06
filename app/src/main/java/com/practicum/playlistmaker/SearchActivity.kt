@@ -46,18 +46,23 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
     val historyAdapter = TrackAdapter(historyList)
     val historyManager = HistoryManager()
     private lateinit var queryInput: EditText
+    private  val handler = Handler(Looper.getMainLooper())
+    private lateinit var errorNet: LinearLayout
+    private lateinit var errorView: LinearLayout
+    private lateinit var rvTrack: RecyclerView
+    private var currentQuery: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        val rvTrack = findViewById<RecyclerView>(R.id.recyclerView)
+        rvTrack = findViewById(R.id.recyclerView)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
 
         val searchEditText = findViewById<EditText>(R.id.searchEditText)
         val clearIcon = findViewById<ImageView>(R.id.clearIcon)
-        val errorNet = findViewById<LinearLayout>(R.id.errorNet)
-        val errorView = findViewById<LinearLayout>(R.id.errorView)
+        errorNet = findViewById(R.id.errorNet)
+        errorView = findViewById(R.id.errorView)
         val refreshButton = findViewById<MaterialButton>(R.id.refreshButton)
         val historyView = findViewById<LinearLayout>(R.id.historyView)
         val clearHistoryButton = findViewById<MaterialButton>(R.id.clearSearch)
@@ -98,28 +103,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-
-                if (s.isNullOrEmpty() && searchEditText.hasFocus()) {
-                    historyList.clear()
-                    historyList.addAll(historyManager.getHistory())
-                    rvTrack.adapter = historyAdapter
-                    historyAdapter.updateTracks(historyList)
-
-                    if (historyList.isNotEmpty()) {
-                        historyView.visibility = View.VISIBLE
-                        clearHistoryButton.visibility = View.VISIBLE
-
-                    } else {
-                        historyView.visibility = View.GONE
-                        clearHistoryButton.visibility = View.GONE
-
-                    }
-                } else {
-                    historyView.visibility = View.GONE
-                    clearHistoryButton.visibility = View.GONE
-                    rvTrack.adapter = trackAdapter
-
-                }
+                searchDebounce(s.toString())
 
             }
 
@@ -183,46 +167,6 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         }
 
         queryInput = searchEditText
-        fun performSearch(query: String) {
-            if (query.isBlank()) return
-
-            lastSearchQuery = query
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(queryInput.windowToken, 0)
-
-            trackList.clear()
-            trackAdapter.notifyDataSetChanged()
-
-            trackApiService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-                        if (responseBody != null && responseBody.resultCount > 0) {
-                            trackList.addAll(responseBody.results)
-                            errorNet.visibility = View.GONE
-                            errorView.visibility = View.GONE
-                            rvTrack.adapter = trackAdapter
-                        } else {
-                            errorView.visibility = View.VISIBLE
-                            errorNet.visibility = View.GONE
-                        }
-                    } else {
-                        errorNet.visibility = View.VISIBLE
-                        errorView.visibility = View.GONE
-                    }
-                    trackAdapter.notifyDataSetChanged()
-                }
-
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    errorNet.visibility = View.VISIBLE
-                    errorView.visibility = View.GONE
-                }
-            })
-        }
-
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 performSearch(queryInput.text.toString())
@@ -245,6 +189,45 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
         }
 
+    }
+    private fun performSearch(query: String) {
+        if (query.isBlank()) return
+
+        lastSearchQuery = query
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(queryInput.windowToken, 0)
+
+        trackList.clear()
+        trackAdapter.notifyDataSetChanged()
+
+        trackApiService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
+            override fun onResponse(
+                call: Call<TrackResponse>,
+                response: Response<TrackResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    if (responseBody != null && responseBody.resultCount > 0) {
+                        trackList.addAll(responseBody.results)
+                        errorNet.visibility = View.GONE
+                        errorView.visibility = View.GONE
+                        rvTrack.adapter = trackAdapter
+                    } else {
+                        errorView.visibility = View.VISIBLE
+                        errorNet.visibility = View.GONE
+                    }
+                } else {
+                    errorNet.visibility = View.VISIBLE
+                    errorView.visibility = View.GONE
+                }
+                trackAdapter.notifyDataSetChanged()
+            }
+
+            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                errorNet.visibility = View.VISIBLE
+                errorView.visibility = View.GONE
+            }
+        })
     }
 
     override fun onTrackClick(track: Track) {
@@ -273,7 +256,6 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
 
     private var isClickAllowed = true
-    private val handler = Handler(Looper.getMainLooper())
 
     private fun clickDebounce() : Boolean {
         val current = isClickAllowed
@@ -282,6 +264,13 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
         }
         return current
+    }
+
+    private val searchRunnable = Runnable {performSearch(currentQuery) }
+    private fun searchDebounce(query: String) {
+        currentQuery = query
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
 }
