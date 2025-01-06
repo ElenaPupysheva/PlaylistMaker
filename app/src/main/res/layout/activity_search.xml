@@ -106,7 +106,14 @@
             android:text="@string/error_refresh" />
     </LinearLayout>
 
+    <ProgressBar android:id="@+id/progressBar"
+        style="@style/progressBarStyle"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/size_140dp"
+        android:visibility="gone"/>
+
     <LinearLayout
+        android:id="@+id/historyLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">

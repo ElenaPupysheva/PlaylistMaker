@@ -17,4 +17,5 @@
     <color name="playerColorText">#AEAFB4</color>
     <color name="textplus">#1A1B22</color>
     <color name="button_color">#1A1B22</color>
+    <color name="progressBar">#3772E7</color>
 </resources>

@@ -3,6 +3,8 @@ package com.practicum.playlistmaker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -44,6 +46,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
     val historyAdapter = TrackAdapter(historyList)
     val historyManager = HistoryManager()
     private lateinit var queryInput: EditText
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +90,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+
 
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -178,8 +182,6 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
         }
 
-
-
         queryInput = searchEditText
         fun performSearch(query: String) {
             if (query.isBlank()) return
@@ -251,11 +253,12 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         historyList.addAll(historyManager.getHistory())
         historyAdapter.updateTracks(historyList)
 
-        val intent = Intent(this, PlayerActivity::class.java)
-        val jsonTrack = Gson().toJson(track)
-        intent.putExtra(EXTRA_TRACK, jsonTrack)
+        if (clickDebounce()){
+            val intent = Intent(this, PlayerActivity::class.java)
+            val jsonTrack = Gson().toJson(track)
+            intent.putExtra(EXTRA_TRACK, jsonTrack)
 
-        startActivity(intent)
+            startActivity(intent)}
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -268,8 +271,17 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         stringValue = savedInstanceState.getString(TEXT_AMOUNT, AMOUNT_DEF)
     }
 
-    companion object {
-        const val TEXT_AMOUNT = "TEXT_AMOUNT"
-        const val AMOUNT_DEF = ""
+
+    private var isClickAllowed = true
+    private val handler = Handler(Looper.getMainLooper())
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
+
 }
