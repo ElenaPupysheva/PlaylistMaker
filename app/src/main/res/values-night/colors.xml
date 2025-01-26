@@ -10,6 +10,7 @@
     <color name="main_background">#1A1B22</color>
     <color name="textplus">#FFFFFF</color>
     <color name="button_color">#1A1B22</color>
+    <color name="progressBar">#3772E7</color>
 
 
 </resources>

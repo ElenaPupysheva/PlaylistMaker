@@ -1,7 +1,11 @@
 package com.practicum.playlistmaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +30,12 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var genreName: TextView
     private lateinit var countryName: TextView
     private lateinit var group: Group
+    private lateinit var playButton: ImageButton
+    private lateinit var url: String
+    private var mediaPlayer = MediaPlayer()
+    private var playerState = STATE_DEFAULT
+
+    private val handler = Handler(Looper.getMainLooper())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,28 +53,29 @@ class PlayerActivity : AppCompatActivity() {
         genreName = findViewById(R.id.genreName)
         countryName = findViewById(R.id.countryName)
         group = findViewById(R.id.group)
-
-        toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
+        playButton = findViewById(R.id.playButton)
 
         val jsonTrack = intent.getStringExtra(EXTRA_TRACK)
-        val track = Gson().fromJson(jsonTrack, Track::class.java)
         if (jsonTrack == null) {
             finish()
             return
         }
+        val track = Gson().fromJson(jsonTrack, Track::class.java)
+
+        if (track.previewUrl.isNullOrEmpty()) {
+            finish()
+            return
+        }
+        url = track.previewUrl
 
         trackName.text = track.trackName
         groupName.text = track.artistName
-        durationText.text =
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
-        timeDuration.text = """00:00"""
-
-        if (track.collectionName.isNullOrEmpty()) {
-            group.visibility = View.GONE
-        } else {
+        durationText.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
+        if (!track.collectionName.isNullOrEmpty()) {
             albumName.text = track.collectionName
+            group.visibility = View.VISIBLE
+        } else {
+            group.visibility = View.GONE
         }
 
         yearName.text = track.releaseDate.substring(0, 4)
@@ -76,5 +87,75 @@ class PlayerActivity : AppCompatActivity() {
             .placeholder(R.drawable.placeholder)
             .transform(RoundedCorners(16))
             .into(trackCover)
+
+        preparePlayer()
+        playButton.setOnClickListener {
+            playbackControl()
+        }
+
+        toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
     }
+
+    private val startProgressRunnable = object : Runnable {
+        override fun run() {
+            if (playerState == STATE_PLAYING) {
+                timeDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+                handler.postDelayed(this, TIMER_UPDATE_TIME)
+            }
+        }
+    }
+    private fun preparePlayer() {
+        mediaPlayer.setDataSource(url)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            playButton.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            playButton.setImageResource(R.drawable.play_button)
+            timeDuration.text = "0:00"
+            playerState = STATE_PREPARED
+            handler.removeCallbacks(startProgressRunnable)
+        }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        playButton.setImageResource(R.drawable.pause_button)
+        playerState = STATE_PLAYING
+        handler.post(startProgressRunnable)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        playButton.setImageResource(R.drawable.play_button)
+        playerState = STATE_PAUSED
+        handler.removeCallbacks(startProgressRunnable)
+    }
+
+    private fun playbackControl() {
+        when(playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (playerState == STATE_PLAYING) {
+            pausePlayer()
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        handler.removeCallbacks(startProgressRunnable)
+    }
+
 }
