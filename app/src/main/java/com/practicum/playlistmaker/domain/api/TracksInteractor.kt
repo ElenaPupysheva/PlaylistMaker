@@ -9,5 +9,4 @@ interface TracksInteractor {
         fun consume(foundTracks: List<Track>)
     }
 
-    fun searchMovies(expression: String, consumer: TracksConsumer)
 }

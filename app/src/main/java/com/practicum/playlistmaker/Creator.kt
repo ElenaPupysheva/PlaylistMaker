@@ -7,11 +7,11 @@ import com.practicum.playlistmaker.domain.api.TracksRepository
 import com.practicum.playlistmaker.domain.impl.TracksInteractorImpl
 
 object Creator {
-    private fun getMoviesRepository(): TracksRepository {
+    private fun getTracksRepository(): TracksRepository {
         return TracksRepositoryImpl(RetrofitNetworkClient())
     }
 
-    fun provideMoviesInteractor(): TracksInteractor {
-        return TracksInteractorImpl(getMoviesRepository())
+    fun provideTracksInteractor(): TracksInteractor {
+        return TracksInteractorImpl(getTracksRepository())
     }
 }

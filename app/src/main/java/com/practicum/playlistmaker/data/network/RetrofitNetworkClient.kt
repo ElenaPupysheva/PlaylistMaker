@@ -8,16 +8,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitNetworkClient : NetworkClient {
 
-    private val ITunesURL: String = "https://itunes.apple.com"
+    private val urlMusic: String = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
-        .baseUrl(ITunesURL)
+        .baseUrl(urlMusic)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-    private val imdbService = retrofit.create(ITunesAPI::class.java)
+    private val iTunesService = retrofit.create(TrackApiService::class.java)
 
     override fun doRequest(dto: Any): TrackResponse {
         if (dto is TracksSearchRequest) {
-            val resp = imdbService.searchMovies(dto.expression).execute()
+            val resp = iTunesService.searchTracks(dto.expression).execute()
 
             val body = resp.body() ?: TrackResponse()
 

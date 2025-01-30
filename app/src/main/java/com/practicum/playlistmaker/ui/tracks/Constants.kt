@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.tracks
 
 const val PRACTICUM_PREFERENCES = "practicum_preferences"
 const val SEARCH_HISTORY = "practicum_preferences"
