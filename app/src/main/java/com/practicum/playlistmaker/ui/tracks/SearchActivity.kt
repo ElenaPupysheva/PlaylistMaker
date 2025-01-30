@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.tracks
 
 import android.content.Context
 import android.content.Intent
@@ -21,6 +21,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
+import com.practicum.playlistmaker.AMOUNT_DEF
+import com.practicum.playlistmaker.CLICK_DEBOUNCE_DELAY
+import com.practicum.playlistmaker.EXTRA_TRACK
+import com.practicum.playlistmaker.HistoryManager
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.SEARCH_DEBOUNCE_DELAY
+import com.practicum.playlistmaker.TEXT_AMOUNT
+import com.practicum.playlistmaker.data.network.TrackApiService
+import com.practicum.playlistmaker.data.dto.TrackResponse
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.player.PlayerActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

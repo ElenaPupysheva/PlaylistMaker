@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.player
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -14,6 +14,14 @@ import androidx.constraintlayout.widget.Group
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
+import com.practicum.playlistmaker.EXTRA_TRACK
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.STATE_DEFAULT
+import com.practicum.playlistmaker.STATE_PAUSED
+import com.practicum.playlistmaker.STATE_PLAYING
+import com.practicum.playlistmaker.STATE_PREPARED
+import com.practicum.playlistmaker.TIMER_UPDATE_TIME
+import com.practicum.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
