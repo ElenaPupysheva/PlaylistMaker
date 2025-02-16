@@ -24,6 +24,10 @@ import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.network.TrackApiService
 import com.practicum.playlistmaker.data.dto.TrackResponse
+import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
+import com.practicum.playlistmaker.data.network.TracksRepositoryImpl
+import com.practicum.playlistmaker.domain.api.TracksInteractor
+import com.practicum.playlistmaker.domain.impl.TracksInteractorImpl
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.player.PlayerActivity
 import retrofit2.Call
@@ -33,6 +37,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
+
+    private val tracksInteractor: TracksInteractor by lazy {
+        val networkClient = RetrofitNetworkClient()
+        val repository = TracksRepositoryImpl(networkClient)
+        TracksInteractorImpl(repository)
+    }
 
     private var stringValue: String = AMOUNT_DEF
     private var lastSearchQuery: String = ""
@@ -215,37 +225,24 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         trackList.clear()
         trackAdapter.notifyDataSetChanged()
 
-        trackApiService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(
-                call: Call<TrackResponse>,
-                response: Response<TrackResponse>
-            ) {
+        Thread {
+            val result = tracksInteractor.searchTracks(query)
+
+            runOnUiThread {
                 progressBar.visibility = View.GONE
                 rvTrack.visibility = View.VISIBLE
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null && responseBody.resultCount > 0) {
-                        trackList.addAll(responseBody.results)
-                        errorNet.visibility = View.GONE
-                        errorView.visibility = View.GONE
-                        rvTrack.adapter = trackAdapter
-                    } else {
-                        errorView.visibility = View.VISIBLE
-                        errorNet.visibility = View.GONE
-                    }
-                } else {
-                    errorNet.visibility = View.VISIBLE
-                    errorView.visibility = View.GONE
-                }
-                trackAdapter.notifyDataSetChanged()
-            }
 
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                progressBar.visibility = View.GONE
-                errorNet.visibility = View.VISIBLE
-                errorView.visibility = View.GONE
+                if (result.isNotEmpty()) {
+                    trackList.addAll(result)
+                    errorNet.visibility = View.GONE
+                    errorView.visibility = View.GONE
+                    rvTrack.adapter = trackAdapter
+                } else {
+                    errorView.visibility = View.VISIBLE
+                    errorNet.visibility = View.GONE
+                }
             }
-        })
+        }.start()
     }
 
     override fun onTrackClick(track: Track) {

@@ -9,20 +9,21 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
 
     override fun searchTracks(expression: String): List<Track> {
         val response = networkClient.doRequest(TracksSearchRequest(expression))
-        if (response.resultCode == 200) {
-            return (response as TrackSearchResponse).results.map {
-                Track(it.trackId,
-                    it.trackName,
-                    it.artistName,
-                    it.trackTimeMillis,
-                    it.artworkUrl100,
-                    it.collectionName,
-                    it.releaseDate,
-                    it.primaryGenreName,
-                    it.country,
-                    it.previewUrl)  }
+        return if (response.resultCode == 200) {
+            val trackSearchResponse =response as TrackSearchResponse
+            trackSearchResponse.results.map { dto ->
+                Track(dto.trackId,
+                    dto.trackName,
+                    dto.artistName,
+                    dto.trackTimeMillis,
+                    dto.artworkUrl100,
+                    dto.collectionName,
+                    dto.releaseDate,
+                    dto.primaryGenreName,
+                    dto.country,
+                    dto.previewUrl)  }
         } else {
-            return emptyList()
+           emptyList()
         }
     }
 }
