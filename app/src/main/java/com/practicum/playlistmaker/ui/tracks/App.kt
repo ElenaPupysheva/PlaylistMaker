@@ -2,6 +2,8 @@ package com.practicum.playlistmaker.ui.tracks
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
+import com.practicum.playlistmaker.domain.models.SWITCH_KEY
 
 class App : Application() {
     var darkTheme = false

@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
+import com.practicum.playlistmaker.domain.models.SWITCH_KEY
 
 
 class SettingsActivity : AppCompatActivity() {

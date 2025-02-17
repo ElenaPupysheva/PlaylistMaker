@@ -1,8 +1,8 @@
 package com.practicum.playlistmaker.data.network
 
 import com.practicum.playlistmaker.data.dto.TrackResponse
+import com.practicum.playlistmaker.data.dto.TrackSearchResponse
 import com.practicum.playlistmaker.data.dto.TracksSearchRequest
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -19,9 +19,13 @@ class RetrofitNetworkClient : NetworkClient {
         if (dto is TracksSearchRequest) {
             val resp = iTunesService.searchTracks(dto.expression).execute()
 
-            val body = resp.body() ?: TrackResponse()
+            val body = resp.body() ?: TrackSearchResponse(
+                resultCount = 0,
+                results = emptyList()
+            )
 
             return body.apply { resultCode = resp.code() }
+
         } else {
             return TrackResponse().apply { resultCode = 400 }
         }

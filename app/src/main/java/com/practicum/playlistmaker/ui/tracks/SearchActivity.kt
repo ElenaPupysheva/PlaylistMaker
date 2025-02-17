@@ -23,16 +23,17 @@ import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.network.TrackApiService
-import com.practicum.playlistmaker.data.dto.TrackResponse
 import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.data.network.TracksRepositoryImpl
 import com.practicum.playlistmaker.domain.api.TracksInteractor
 import com.practicum.playlistmaker.domain.impl.TracksInteractorImpl
+import com.practicum.playlistmaker.domain.models.AMOUNT_DEF
+import com.practicum.playlistmaker.domain.models.CLICK_DEBOUNCE_DELAY
+import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
+import com.practicum.playlistmaker.domain.models.SEARCH_DEBOUNCE_DELAY
+import com.practicum.playlistmaker.domain.models.TEXT_AMOUNT
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.player.PlayerActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
