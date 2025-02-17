@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.tracks
 
 import android.content.Context
 import android.content.Intent
@@ -21,29 +21,34 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.models.AMOUNT_DEF
+import com.practicum.playlistmaker.domain.models.CLICK_DEBOUNCE_DELAY
+import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
+import com.practicum.playlistmaker.domain.models.SEARCH_DEBOUNCE_DELAY
+import com.practicum.playlistmaker.domain.models.TEXT_AMOUNT
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.player.PlayerActivity
+
 
 class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
+
+    private val tracksInteractor by lazy {
+        Creator.tracksInteractor
+    }
+
+    private val historyInteractor by lazy {
+        Creator.historyInteractor
+    }
 
     private var stringValue: String = AMOUNT_DEF
     private var lastSearchQuery: String = ""
 
-    private val urlMusic: String = "https://itunes.apple.com"
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(urlMusic)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val trackApiService = retrofit.create(TrackApiService::class.java)
     val trackList: MutableList<Track> = mutableListOf()
     val trackAdapter = TrackAdapter(trackList)
     val historyList: MutableList<Track> = mutableListOf()
     val historyAdapter = TrackAdapter(historyList)
-    val historyManager = HistoryManager()
     private lateinit var queryInput: EditText
     private  val handler = Handler(Looper.getMainLooper())
     private lateinit var errorNet: LinearLayout
@@ -74,8 +79,8 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         rvTrack.layoutManager = LinearLayoutManager(this)
         rvTrack.adapter = trackAdapter
 
-        historyManager.init(getSharedPreferences("SEARCH_HISTORY", MODE_PRIVATE))
-        historyList.addAll(historyManager.getHistory())
+        historyList.clear()
+        historyList.addAll(historyInteractor.getHistory())
 
         trackList.clear()
         searchEditText.text.clear()
@@ -125,7 +130,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
             if (hasFocus && searchEditText.text.isEmpty()) {
                 historyList.clear()
-                historyList.addAll(historyManager.getHistory())
+                historyList.addAll(historyInteractor.getHistory())
                 rvTrack.adapter = historyAdapter
                 historyAdapter.updateTracks(historyList)
 
@@ -152,7 +157,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             trackAdapter.updateTracks(trackList)
 
             historyList.clear()
-            historyList.addAll(historyManager.getHistory())
+            historyList.addAll(historyInteractor.getHistory())
             if (historyList.isNotEmpty()) {
                 historyView.visibility = View.VISIBLE
                 clearHistoryButton.visibility = View.VISIBLE
@@ -184,7 +189,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             performSearch(lastSearchQuery)
         }
         clearHistoryButton.setOnClickListener {
-            historyManager.clearHistory()
+            historyInteractor.clearHistory()
             historyList.clear()
             historyAdapter.updateTracks(historyList)
             historyView.visibility = View.GONE
@@ -210,43 +215,30 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         trackList.clear()
         trackAdapter.notifyDataSetChanged()
 
-        trackApiService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(
-                call: Call<TrackResponse>,
-                response: Response<TrackResponse>
-            ) {
+        Thread {
+            val result = tracksInteractor.searchTracks(query)
+
+            runOnUiThread {
                 progressBar.visibility = View.GONE
                 rvTrack.visibility = View.VISIBLE
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null && responseBody.resultCount > 0) {
-                        trackList.addAll(responseBody.results)
-                        errorNet.visibility = View.GONE
-                        errorView.visibility = View.GONE
-                        rvTrack.adapter = trackAdapter
-                    } else {
-                        errorView.visibility = View.VISIBLE
-                        errorNet.visibility = View.GONE
-                    }
-                } else {
-                    errorNet.visibility = View.VISIBLE
-                    errorView.visibility = View.GONE
-                }
-                trackAdapter.notifyDataSetChanged()
-            }
 
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                progressBar.visibility = View.GONE
-                errorNet.visibility = View.VISIBLE
-                errorView.visibility = View.GONE
+                if (result.isNotEmpty()) {
+                    trackList.addAll(result)
+                    errorNet.visibility = View.GONE
+                    errorView.visibility = View.GONE
+                    rvTrack.adapter = trackAdapter
+                } else {
+                    errorView.visibility = View.VISIBLE
+                    errorNet.visibility = View.GONE
+                }
             }
-        })
+        }.start()
     }
 
     override fun onTrackClick(track: Track) {
-        historyManager.add(track)
+        historyInteractor.addTrack(track)
         historyList.clear()
-        historyList.addAll(historyManager.getHistory())
+        historyList.addAll(historyInteractor.getHistory())
         historyAdapter.updateTracks(historyList)
 
         if (clickDebounce()){
