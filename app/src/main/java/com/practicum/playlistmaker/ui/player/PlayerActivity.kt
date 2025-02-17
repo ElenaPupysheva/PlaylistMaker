@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.Group
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
+import com.practicum.playlistmaker.Creator
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.player.AndroidAudioPlayer
@@ -46,11 +47,11 @@ class PlayerActivity : AppCompatActivity() {
 
 
     private val handler = Handler(Looper.getMainLooper())
+
     private val playerInteractor: PlayerInteractor by lazy {
-        PlayerInteractorImpl(
-            audioPlayer = AndroidAudioPlayer()
-        )
+        Creator.playerInteractor
     }
+
     private val updateProgressRunnable = object : Runnable {
         override fun run() {
             if (playerInteractor.getPlayerState() == STATE_PLAYING) {

@@ -21,12 +21,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
+import com.practicum.playlistmaker.Creator
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.data.network.TrackApiService
-import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
-import com.practicum.playlistmaker.data.network.TracksRepositoryImpl
-import com.practicum.playlistmaker.domain.api.TracksInteractor
-import com.practicum.playlistmaker.domain.impl.TracksInteractorImpl
 import com.practicum.playlistmaker.domain.models.AMOUNT_DEF
 import com.practicum.playlistmaker.domain.models.CLICK_DEBOUNCE_DELAY
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
@@ -34,32 +30,25 @@ import com.practicum.playlistmaker.domain.models.SEARCH_DEBOUNCE_DELAY
 import com.practicum.playlistmaker.domain.models.TEXT_AMOUNT
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.player.PlayerActivity
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
 
 class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
-    private val tracksInteractor: TracksInteractor by lazy {
-        val networkClient = RetrofitNetworkClient()
-        val repository = TracksRepositoryImpl(networkClient)
-        TracksInteractorImpl(repository)
+    private val tracksInteractor by lazy {
+        Creator.tracksInteractor
+    }
+
+    private val historyInteractor by lazy {
+        Creator.historyInteractor
     }
 
     private var stringValue: String = AMOUNT_DEF
     private var lastSearchQuery: String = ""
 
-    private val urlMusic: String = "https://itunes.apple.com"
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(urlMusic)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val trackApiService = retrofit.create(TrackApiService::class.java)
     val trackList: MutableList<Track> = mutableListOf()
     val trackAdapter = TrackAdapter(trackList)
     val historyList: MutableList<Track> = mutableListOf()
     val historyAdapter = TrackAdapter(historyList)
-    val historyManager = HistoryManager()
     private lateinit var queryInput: EditText
     private  val handler = Handler(Looper.getMainLooper())
     private lateinit var errorNet: LinearLayout
@@ -90,8 +79,8 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         rvTrack.layoutManager = LinearLayoutManager(this)
         rvTrack.adapter = trackAdapter
 
-        historyManager.init(getSharedPreferences("SEARCH_HISTORY", MODE_PRIVATE))
-        historyList.addAll(historyManager.getHistory())
+        historyList.clear()
+        historyList.addAll(historyInteractor.getHistory())
 
         trackList.clear()
         searchEditText.text.clear()
@@ -141,7 +130,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
 
             if (hasFocus && searchEditText.text.isEmpty()) {
                 historyList.clear()
-                historyList.addAll(historyManager.getHistory())
+                historyList.addAll(historyInteractor.getHistory())
                 rvTrack.adapter = historyAdapter
                 historyAdapter.updateTracks(historyList)
 
@@ -168,7 +157,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             trackAdapter.updateTracks(trackList)
 
             historyList.clear()
-            historyList.addAll(historyManager.getHistory())
+            historyList.addAll(historyInteractor.getHistory())
             if (historyList.isNotEmpty()) {
                 historyView.visibility = View.VISIBLE
                 clearHistoryButton.visibility = View.VISIBLE
@@ -200,7 +189,7 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             performSearch(lastSearchQuery)
         }
         clearHistoryButton.setOnClickListener {
-            historyManager.clearHistory()
+            historyInteractor.clearHistory()
             historyList.clear()
             historyAdapter.updateTracks(historyList)
             historyView.visibility = View.GONE
@@ -247,9 +236,9 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
     }
 
     override fun onTrackClick(track: Track) {
-        historyManager.add(track)
+        historyInteractor.addTrack(track)
         historyList.clear()
-        historyList.addAll(historyManager.getHistory())
+        historyList.addAll(historyInteractor.getHistory())
         historyAdapter.updateTracks(historyList)
 
         if (clickDebounce()){
