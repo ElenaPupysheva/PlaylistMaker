@@ -1,35 +1,33 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.domain.impl
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.practicum.playlistmaker.domain.api.HistoryRepository
+import com.practicum.playlistmaker.domain.models.Track
 
-class HistoryManager {
-
-    private val gson = Gson()
-    private lateinit var sharedPreferences: SharedPreferences
-
-    fun init(sharedPreferences: SharedPreferences) {
-        this.sharedPreferences = sharedPreferences
-    }
+class HistoryRepositoryImpl (
+    private val sharedPrefs: SharedPreferences,
+    private val gson: Gson
+) : HistoryRepository {
 
     companion object {
         private const val HISTORY_KEY = "search_history"
         private const val MAX_HISTORY_SIZE = 10
     }
 
-    fun getHistory(): List<Track> {
-        val json = sharedPreferences.getString(HISTORY_KEY, null) ?: return emptyList()
+    override fun getHistory(): List<Track> {
+        val json = sharedPrefs.getString(HISTORY_KEY, null) ?: return emptyList()
         return gson.fromJson(json, Array<Track>::class.java).toList()
     }
 
-    fun setHistory(history: List<Track>) {
+    override fun setHistory(history: List<Track>) {
         val json = gson.toJson(history)
-        sharedPreferences.edit()
+        sharedPrefs.edit()
             .putString(HISTORY_KEY, json)
             .apply()
     }
 
-    fun add(track: Track) {
+    override fun addTrack(track: Track) {
         val history = getHistory().toMutableList()
         history.removeAll { it.trackId == track.trackId }
         history.add(0, track)
@@ -39,8 +37,8 @@ class HistoryManager {
         setHistory(history)
     }
 
-    fun clearHistory() {
-        sharedPreferences.edit().remove(HISTORY_KEY).apply()
+    override fun clearHistory() {
+        sharedPrefs.edit().remove(HISTORY_KEY).apply()
     }
 
 
