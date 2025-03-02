@@ -3,45 +3,64 @@ package com.practicum.playlistmaker.settings.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
 import com.practicum.playlistmaker.domain.models.SWITCH_KEY
 import com.practicum.playlistmaker.main.ui.MainActivity
 import com.practicum.playlistmaker.App
-
+import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
+import com.practicum.playlistmaker.settings.data.SettingsRepositoryImpl
+import com.practicum.playlistmaker.settings.domain.SettingsInteractorImpl
+import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
+import com.practicum.playlistmaker.settings.presentation.SettingsViewModelFactory
 
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var viewModel: SettingsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+
+        viewModel = ViewModelProvider(
+            this,
+            SettingsViewModelFactory(
+                SettingsInteractorImpl(
+                    SettingsRepositoryImpl(
+                        getSharedPreferences("PRACTICUM_PREFERENCES", MODE_PRIVATE)
+                    )
+                )
+            )
+        )[SettingsViewModel::class.java]
 
         val sharedPrefs = getSharedPreferences(PRACTICUM_PREFERENCES, MODE_PRIVATE)
         val isDarkTheme = sharedPrefs.getBoolean(SWITCH_KEY, false)
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
-        themeSwitcher.isChecked = isDarkTheme
+        binding.themeSwitcher.isChecked = isDarkTheme
 
-        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
-            (applicationContext as App).switchTheme(isChecked)
-            sharedPrefs.edit().putBoolean(SWITCH_KEY, isChecked).apply()
-        }
 
-        // Enable the navigation icon (back button)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
+        viewModel.darkThemeEnabled.observe(this) { isEnabled ->
+            binding.themeSwitcher.isChecked = isEnabled
+            (applicationContext as App).switchTheme(isEnabled)
+        }
 
-        val appSharing = findViewById<TextView>(R.id.appShare)
-        appSharing.setOnClickListener {
+        binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onThemeToggled(isChecked)
+        }
+
+
+        binding.appShare.setOnClickListener {
             val shareMessage = getString(R.string.link_course)
             val shareIntent = Intent().apply {
                 action = Intent.ACTION_SEND
@@ -52,8 +71,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(chooser)
         }
 
-        val mailSend = findViewById<TextView>(R.id.mailSupport)
-        mailSend.setOnClickListener {
+        binding.mailSupport.setOnClickListener {
             val message = getString(R.string.message_text)
             val theme = getString(R.string.theme_text)
             val shareIntent = Intent(Intent.ACTION_SENDTO)
@@ -64,8 +82,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(shareIntent)
         }
 
-        val agreementOpen = findViewById<TextView>(R.id.userAgreement)
-        agreementOpen.setOnClickListener {
+        binding.userAgreement.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.link_agreement)))
             startActivity(browserIntent)
         }
