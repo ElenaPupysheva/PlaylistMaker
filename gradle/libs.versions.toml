@@ -13,6 +13,7 @@ glide = "4.14.2"
 gson = "2.10"
 retrofit = "2.9.0"
 converter-gson = "2.9.0"
+androidx="2.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +29,7 @@ glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = 
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converter-gson" }
+androidx = {module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref="androidx"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
