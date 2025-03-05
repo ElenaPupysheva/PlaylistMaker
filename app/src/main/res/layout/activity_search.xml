@@ -126,7 +126,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 style="@style/youSearchStyle"
-                android:id="@+id/you_Search"
+                android:id="@+id/youSearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/you_search" />

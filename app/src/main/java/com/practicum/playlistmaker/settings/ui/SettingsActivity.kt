@@ -6,8 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
-import com.practicum.playlistmaker.domain.models.SWITCH_KEY
 import com.practicum.playlistmaker.main.ui.MainActivity
 import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
@@ -38,10 +36,6 @@ class SettingsActivity : AppCompatActivity() {
                 )
             )
         )[SettingsViewModel::class.java]
-
-        val sharedPrefs = getSharedPreferences(PRACTICUM_PREFERENCES, MODE_PRIVATE)
-        val isDarkTheme = sharedPrefs.getBoolean(SWITCH_KEY, false)
-        binding.themeSwitcher.isChecked = isDarkTheme
 
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
