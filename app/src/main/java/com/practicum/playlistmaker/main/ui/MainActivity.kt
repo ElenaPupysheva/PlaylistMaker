@@ -1,34 +1,54 @@
 package com.practicum.playlistmaker.main.ui
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.ActivityMainBinding
+import com.practicum.playlistmaker.main.presentation.MainViewModel
+import com.practicum.playlistmaker.main.presentation.NavigationEvent
 import com.practicum.playlistmaker.media.ui.MediaActivity
 import com.practicum.playlistmaker.search.ui.SearchActivity
 import com.practicum.playlistmaker.settings.ui.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setupButtons()
+        observeViewModel()
 
-        val searchButton = findViewById<Button>(R.id.search_button)
-        val mediaButton = findViewById<Button>(R.id.media_button)
-        val setButton = findViewById<Button>(R.id.setting_button)
+    }
 
-        searchButton.setOnClickListener {
-            val searchIntent = Intent(this, SearchActivity::class.java)
-            startActivity(searchIntent)
+    private fun setupButtons() {
+        binding.searchButton.setOnClickListener {
+            viewModel.onSearchClicked()
         }
-        mediaButton.setOnClickListener {
-            val mediaIntent = Intent(this, MediaActivity::class.java)
-            startActivity(mediaIntent)
+        binding.mediaButton.setOnClickListener {
+            viewModel.onMediaClicked()
         }
-        setButton.setOnClickListener {
-            val setIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(setIntent)
+        binding.settingButton.setOnClickListener {
+            viewModel.onSettingsClicked()
         }
+    }
 
+    private fun observeViewModel() {
+        viewModel.navigationEvent.observe(this) { event ->
+            when (event) {
+                NavigationEvent.OpenSearch -> {
+                    startActivity(Intent(this, SearchActivity::class.java))
+                }
+
+                NavigationEvent.OpenMedia -> {
+                    startActivity(Intent(this, MediaActivity::class.java))
+                }
+
+                NavigationEvent.OpenSettings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+            }
+        }
     }
 }
