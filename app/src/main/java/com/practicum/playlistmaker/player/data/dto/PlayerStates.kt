@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.search.data.dto
+package com.practicum.playlistmaker.player.data.dto
 
 enum class PlayerStates {
     DEFAULT,

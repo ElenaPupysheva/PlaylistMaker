@@ -56,5 +56,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter)
     implementation(libs.androidx)
+    implementation(libs.lifecycleRuntimeKtx)
+    implementation(libs.androidxActivityKtx)
+
 
 }

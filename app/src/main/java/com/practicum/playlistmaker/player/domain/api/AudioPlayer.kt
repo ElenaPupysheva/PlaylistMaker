@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.domain.api
+package com.practicum.playlistmaker.player.domain.api
 
 interface AudioPlayer {
         fun preparePlayer(
@@ -12,5 +12,5 @@ interface AudioPlayer {
 
         fun releasePlayer()
         fun getCurrentPositionMs(): Int
-        fun getPlayerState(): Int
+
 }
