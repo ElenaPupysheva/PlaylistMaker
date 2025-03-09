@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.main.ui.MainActivity
 import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
 import com.practicum.playlistmaker.settings.data.SettingsRepositoryImpl
@@ -39,14 +38,18 @@ class SettingsActivity : AppCompatActivity() {
 
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         binding.toolbar.setNavigationOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            onBackPressedDispatcher.onBackPressed()
         }
+
         viewModel.darkThemeEnabled.observe(this) { isEnabled ->
+            val app = applicationContext as App
+            if (app.darkTheme != isEnabled) {
+                app.switchTheme(isEnabled)
+            }
             binding.themeSwitcher.isChecked = isEnabled
-            (applicationContext as App).switchTheme(isEnabled)
+
         }
 
         binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->

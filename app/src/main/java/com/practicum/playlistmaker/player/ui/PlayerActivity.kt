@@ -13,6 +13,7 @@ import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.player.data.dto.PlayerStates
+import com.practicum.playlistmaker.player.presentation.PlayerUiState
 import com.practicum.playlistmaker.player.presentation.PlayerViewModel
 import com.practicum.playlistmaker.player.presentation.PlayerViewModelFactory
 
@@ -55,32 +56,27 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.playerState.observe(this) { state ->
-            when (state) {
+        viewModel.uiState.observe(this) { uiState: PlayerUiState ->
+            when (uiState.playerState) {
                 PlayerStates.PREPARED -> {
                     binding.playButton.isEnabled = true
                     binding.playButton.setImageResource(R.drawable.play_button)
                 }
-
                 PlayerStates.PLAYING -> {
                     binding.playButton.isEnabled = true
                     binding.playButton.setImageResource(R.drawable.pause_button)
                 }
-
                 PlayerStates.PAUSED -> {
                     binding.playButton.isEnabled = true
                     binding.playButton.setImageResource(R.drawable.play_button)
                 }
-
                 PlayerStates.DEFAULT -> {
                     binding.playButton.isEnabled = false
                     binding.playButton.setImageResource(R.drawable.play_button)
                 }
             }
-        }
 
-        viewModel.currentTime.observe(this) { time ->
-            binding.musicTimeDuration.text = time
+            binding.musicTimeDuration.text = uiState.currentTime
         }
     }
 

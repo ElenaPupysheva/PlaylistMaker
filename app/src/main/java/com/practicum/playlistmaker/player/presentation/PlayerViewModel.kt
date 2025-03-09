@@ -13,38 +13,49 @@ import java.util.Locale
 
 class PlayerViewModel(private val playerInteractor: AudioPlayer) : ViewModel() {
 
-    private val _playerState = MutableLiveData<PlayerStates>(PlayerStates.DEFAULT)
-    val playerState: LiveData<PlayerStates> get() = _playerState
-
-    private val _currentTime = MutableLiveData<String>("0:00")
-    val currentTime: LiveData<String> get() = _currentTime
+    private val _uiState = MutableLiveData<PlayerUiState>(
+        PlayerUiState(
+            playerState = PlayerStates.DEFAULT,
+            currentTime = "0:00"
+        )
+    )
+    val uiState: LiveData<PlayerUiState> = _uiState
 
     private val updateInterval = 1000L
 
     fun preparePlayer(url: String) {
         playerInteractor.preparePlayer(
             url = url,
-            onPrepared = { _playerState.value = PlayerStates.PREPARED },
+            onPrepared = {
+                _uiState.value = _uiState.value?.copy(
+                    playerState = PlayerStates.PREPARED,
+                    currentTime = "0:00"
+                )
+            },
             onCompletion = {
-                _playerState.value = PlayerStates.PREPARED
-                _currentTime.postValue("0:00")
+                _uiState.postValue(
+                    PlayerUiState(
+                        playerState = PlayerStates.PREPARED,
+                        currentTime = "0:00"
+                    )
+                )
             }
         )
     }
 
     fun startPlayer() {
         playerInteractor.startPlayer()
-        _playerState.value = PlayerStates.PLAYING
+        _uiState.value = _uiState.value?.copy(playerState = PlayerStates.PLAYING)
         startUpdatingProgress()
     }
 
     fun pausePlayer() {
         playerInteractor.pausePlayer()
-        _playerState.value = PlayerStates.PAUSED
+        _uiState.value = _uiState.value?.copy(playerState = PlayerStates.PAUSED)
     }
 
     fun playbackControl() {
-        when (_playerState.value) {
+        when (_uiState.value?.playerState) {
             PlayerStates.PLAYING -> pausePlayer()
             PlayerStates.PREPARED, PlayerStates.PAUSED -> startPlayer()
             else -> {}
@@ -53,13 +64,11 @@ class PlayerViewModel(private val playerInteractor: AudioPlayer) : ViewModel() {
 
     private fun startUpdatingProgress() {
         viewModelScope.launch {
-            while (_playerState.value == PlayerStates.PLAYING) {
-                _currentTime.postValue(
-                    SimpleDateFormat(
-                        "mm:ss",
-                        Locale.getDefault()
-                    ).format(playerInteractor.getCurrentPositionMs())
-                )
+            while (_uiState.value?.playerState == PlayerStates.PLAYING) {
+                val newTime = SimpleDateFormat("mm:ss", Locale.getDefault())
+                    .format(playerInteractor.getCurrentPositionMs())
+
+                _uiState.postValue(_uiState.value?.copy(currentTime = newTime))
                 delay(updateInterval)
             }
         }
