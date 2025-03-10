@@ -34,6 +34,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -51,5 +55,9 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.retrofit)
     implementation(libs.converter)
+    implementation(libs.androidx)
+    implementation(libs.lifecycleRuntimeKtx)
+    implementation(libs.androidxActivityKtx)
+
 
 }
