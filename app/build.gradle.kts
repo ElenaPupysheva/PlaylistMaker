@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx)
     implementation(libs.lifecycleRuntimeKtx)
     implementation(libs.androidxActivityKtx)
+    implementation(libs.koinAndroid)
 
 
 }

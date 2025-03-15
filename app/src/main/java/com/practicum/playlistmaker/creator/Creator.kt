@@ -25,17 +25,6 @@ object Creator {
         sharedPrefs = sharedPreferences
     }
 
-    private val networkClient: NetworkClient by lazy {
-        RetrofitNetworkClient()
-    }
-
-    private val tracksRepository: TracksRepository by lazy {
-        TracksRepositoryImpl(networkClient)
-    }
-
-    val tracksInteractor: TracksInteractor by lazy {
-        TracksInteractorImpl(tracksRepository)
-    }
 
 
     private val audioPlayer: AudioPlayer by lazy {
@@ -50,7 +39,5 @@ object Creator {
         HistoryRepositoryImpl(sharedPrefs, gson)
     }
 
-    val historyInteractor: HistoryInteractor by lazy {
-        HistoryInteractorImpl(historyRepository)
-    }
+
 }

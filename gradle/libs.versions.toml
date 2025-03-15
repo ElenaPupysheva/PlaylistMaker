@@ -16,6 +16,7 @@ converter-gson = "2.9.0"
 lifecycleViewModelKtx = "2.6.1"
 lifecycleRuntimeKtx = "2.6.1"
 androidxActivityKtx = "1.8.0"
+koin-android = "3.3.0"
 
 
 [libraries]
@@ -35,6 +36,7 @@ converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "c
 androidx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewModelKtx" }
 lifecycleRuntimeKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidxActivityKtx = { group = "androidx.activity", name = "activity-ktx", version = "androidxActivityKtx" }
+koinAndroid = { module = "io.insert-koin:koin-android", version.ref = "koin-android" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
