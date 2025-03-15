@@ -1,10 +1,9 @@
-package com.practicum.playlistmaker.player.presentation
+package com.practicum.playlistmaker.player.data.impl
 
 import android.media.MediaPlayer
-import com.practicum.playlistmaker.player.domain.api.AudioPlayer
+import com.practicum.playlistmaker.player.domain.api.AudioRepository
 
-class AndroidAudioPlayer : AudioPlayer {
-    private var mediaPlayer: MediaPlayer? = null
+class AndroidAudioPlayer(private val mediaPlayer: MediaPlayer) : AudioRepository {
     private var onPreparedCallback: (() -> Unit)? = null
     private var onCompletionCallback: (() -> Unit)? = null
 
@@ -17,7 +16,8 @@ class AndroidAudioPlayer : AudioPlayer {
         onPreparedCallback = onPrepared
         onCompletionCallback = onCompletion
 
-        mediaPlayer = MediaPlayer().apply {
+        mediaPlayer.apply {
+            releasePlayer()
             setDataSource(url)
             prepareAsync()
             setOnPreparedListener { onPreparedCallback?.invoke() }
@@ -26,25 +26,28 @@ class AndroidAudioPlayer : AudioPlayer {
     }
 
     override fun startPlayer() {
-        mediaPlayer?.start()
+        mediaPlayer.start()
     }
 
     override fun pausePlayer() {
-        mediaPlayer?.pause()
+        mediaPlayer.pause()
     }
 
     override fun playbackControl() {
-        mediaPlayer?.let {
+        mediaPlayer.let {
             if (it.isPlaying) pausePlayer() else startPlayer()
         }
     }
 
     override fun releasePlayer() {
-        mediaPlayer?.release()
-        mediaPlayer = null
+        mediaPlayer.reset()
+    }
+
+    override fun isPlaying(): Boolean {
+        return mediaPlayer.isPlaying
     }
 
     override fun getCurrentPositionMs(): Int {
-        return mediaPlayer?.currentPosition ?: 0
+        return mediaPlayer.currentPosition
     }
 }

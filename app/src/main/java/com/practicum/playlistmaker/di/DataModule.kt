@@ -2,11 +2,13 @@ package com.practicum.playlistmaker.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.MediaPlayer
 import org.koin.dsl.module
 import com.google.gson.Gson
 import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
-import com.practicum.playlistmaker.player.domain.api.AudioPlayer
-import com.practicum.playlistmaker.player.presentation.AndroidAudioPlayer
+import com.practicum.playlistmaker.player.data.impl.AndroidAudioPlayer
+import com.practicum.playlistmaker.player.domain.api.AudioRepository
+import com.practicum.playlistmaker.player.domain.impl.PlayerInteractorImpl
 import com.practicum.playlistmaker.search.data.network.NetworkClient
 import com.practicum.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.search.data.network.TrackApiService
@@ -33,9 +35,13 @@ val dataModule = module {
 
     factory { Gson() }
 
-    factory<AudioPlayer> {
-        AndroidAudioPlayer()
+    single { MediaPlayer() }
+
+    single<AudioRepository> {
+        AndroidAudioPlayer(get())
     }
+
+    single { PlayerInteractorImpl(get()) }
 
     single<SearchHistoryStorage> {
         SharedPreferencesSearchHistoryStorage(get(), get())

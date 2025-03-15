@@ -1,12 +1,12 @@
 package com.practicum.playlistmaker.player.domain.impl
 
-import com.practicum.playlistmaker.player.domain.api.AudioPlayer
+import com.practicum.playlistmaker.player.domain.api.AudioRepository
 
 class PlayerInteractorImpl(
-    private val audioPlayer: AudioPlayer
-) : AudioPlayer {
+    private val audioPlayer: AudioRepository
+) {
 
-    override fun preparePlayer(
+    fun preparePlayer(
         url: String,
         onPrepared: () -> Unit,
         onCompletion: () -> Unit
@@ -14,23 +14,23 @@ class PlayerInteractorImpl(
         audioPlayer.preparePlayer(url, onPrepared, onCompletion)
     }
 
-    override fun startPlayer() {
+    fun startPlayer() {
         audioPlayer.startPlayer()
     }
 
-    override fun pausePlayer() {
+    fun pausePlayer() {
         audioPlayer.pausePlayer()
     }
 
-    override fun playbackControl() {
+    fun playbackControl() {
         audioPlayer.playbackControl()
     }
 
-    override fun releasePlayer() {
+    fun releasePlayer() {
         audioPlayer.releasePlayer()
     }
 
-    override fun getCurrentPositionMs(): Int {
+    fun getCurrentPositionMs(): Int {
         return audioPlayer.getCurrentPositionMs()
     }
 }

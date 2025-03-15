@@ -5,13 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.data.dto.PlayerStates
-import com.practicum.playlistmaker.player.domain.api.AudioPlayer
+import com.practicum.playlistmaker.player.domain.impl.PlayerInteractorImpl
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel(private val playerInteractor: AudioPlayer) : ViewModel() {
+class PlayerViewModel(private val playerInteractor: PlayerInteractorImpl) : ViewModel() {
 
     private val _uiState = MutableLiveData<PlayerUiState>(
         PlayerUiState(
