@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.search.data.di
+package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.search.presentation.SearchViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel

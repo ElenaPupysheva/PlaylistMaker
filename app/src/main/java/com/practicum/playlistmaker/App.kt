@@ -6,12 +6,12 @@ import android.content.SharedPreferences
 
 import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
 import com.practicum.playlistmaker.domain.models.SWITCH_KEY
-import com.practicum.playlistmaker.player.data.di.playerModule
-import com.practicum.playlistmaker.search.data.di.dataModule
-import com.practicum.playlistmaker.search.data.di.interactorModule
-import com.practicum.playlistmaker.search.data.di.repositoryModule
-import com.practicum.playlistmaker.search.data.di.viewModelModule
-import com.practicum.playlistmaker.settings.data.di.settingsModule
+import com.practicum.playlistmaker.di.playerModule
+import com.practicum.playlistmaker.di.dataModule
+import com.practicum.playlistmaker.di.interactorModule
+import com.practicum.playlistmaker.di.repositoryModule
+import com.practicum.playlistmaker.di.viewModelModule
+import com.practicum.playlistmaker.di.settingsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin

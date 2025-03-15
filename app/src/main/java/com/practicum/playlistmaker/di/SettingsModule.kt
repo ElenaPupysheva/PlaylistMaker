@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.settings.data.di
+package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.settings.data.SettingsRepository
 import com.practicum.playlistmaker.settings.data.SettingsRepositoryImpl

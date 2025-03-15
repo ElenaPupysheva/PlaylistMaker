@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.player.data.di
+package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.player.domain.api.AudioPlayer
 import com.practicum.playlistmaker.player.domain.impl.PlayerInteractorImpl
