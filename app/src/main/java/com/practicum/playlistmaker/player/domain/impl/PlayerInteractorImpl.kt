@@ -1,10 +1,11 @@
 package com.practicum.playlistmaker.player.domain.impl
 
-import com.practicum.playlistmaker.player.domain.api.AudioPlayer
+import com.practicum.playlistmaker.player.domain.api.AudioRepository
+import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
 
 class PlayerInteractorImpl(
-    private val audioPlayer: AudioPlayer
-) : AudioPlayer {
+    private val audioPlayer: AudioRepository
+) : PlayerInteractor {
 
     override fun preparePlayer(
         url: String,
@@ -28,6 +29,10 @@ class PlayerInteractorImpl(
 
     override fun releasePlayer() {
         audioPlayer.releasePlayer()
+    }
+
+    override fun isPlaying(): Boolean {
+        return audioPlayer.isPlaying()
     }
 
     override fun getCurrentPositionMs(): Int {

@@ -6,21 +6,19 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.domain.models.CLICK_DEBOUNCE_DELAY
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.player.ui.PlayerActivity
 import com.practicum.playlistmaker.search.presentation.SearchViewModel
-import com.practicum.playlistmaker.search.presentation.SearchViewModelFactory
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel: SearchViewModel by viewModel()
     private val trackAdapter = TrackAdapter(mutableListOf())
     private val historyAdapter = TrackAdapter(mutableListOf())
     private var isClickAllowed = true
@@ -29,17 +27,17 @@ class SearchActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModelFactory(Creator.tracksInteractor, Creator.historyInteractor)
-        )[SearchViewModel::class.java]
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
+
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = trackAdapter
+
         trackAdapter.setOnTrackClickListener(this)
         historyAdapter.setOnTrackClickListener(this)
+
         viewModel.uiState.observe(this) { state ->
             binding.progressBar.visibility = if (state.isLoading) android.view.View.VISIBLE else android.view.View.GONE
             if (state.isError) {

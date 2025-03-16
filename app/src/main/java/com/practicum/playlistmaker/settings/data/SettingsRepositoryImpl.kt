@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.settings.data
 
 import android.content.SharedPreferences
 import com.practicum.playlistmaker.domain.models.SWITCH_KEY
+import com.practicum.playlistmaker.settings.domain.SettingsRepository
 
 class SettingsRepositoryImpl (
     private val sharedPreferences: SharedPreferences

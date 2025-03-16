@@ -4,19 +4,16 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
-import com.practicum.playlistmaker.settings.data.SettingsRepositoryImpl
-import com.practicum.playlistmaker.settings.domain.SettingsInteractorImpl
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
-import com.practicum.playlistmaker.settings.presentation.SettingsViewModelFactory
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,16 +22,6 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        viewModel = ViewModelProvider(
-            this,
-            SettingsViewModelFactory(
-                SettingsInteractorImpl(
-                    SettingsRepositoryImpl(
-                        getSharedPreferences("PRACTICUM_PREFERENCES", MODE_PRIVATE)
-                    )
-                )
-            )
-        )[SettingsViewModel::class.java]
 
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

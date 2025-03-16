@@ -3,21 +3,42 @@ package com.practicum.playlistmaker
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import android.content.SharedPreferences
-import com.practicum.playlistmaker.creator.Creator
+
 import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
 import com.practicum.playlistmaker.domain.models.SWITCH_KEY
+import com.practicum.playlistmaker.di.playerModule
+import com.practicum.playlistmaker.di.dataModule
+import com.practicum.playlistmaker.di.interactorModule
+import com.practicum.playlistmaker.di.repositoryModule
+import com.practicum.playlistmaker.di.viewModelModule
+import com.practicum.playlistmaker.di.settingsModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.context.startKoin
 
-class App : Application() {
-    var darkTheme = false
+
+class App : Application(), KoinComponent {
 
     private lateinit var themePrefs: SharedPreferences
+
+    var darkTheme = false
 
     override fun onCreate() {
         super.onCreate()
 
+        startKoin {
+            androidContext(this@App)
+            modules(
+                dataModule,
+                interactorModule,
+                repositoryModule,
+                viewModelModule,
+                playerModule,
+                settingsModule
+            )
+        }
         themePrefs = getSharedPreferences(PRACTICUM_PREFERENCES, MODE_PRIVATE)
 
-        Creator.init(getSharedPreferences("SEARCH_HISTORY", MODE_PRIVATE))
 
         if (!themePrefs.contains(SWITCH_KEY)) {
             val isSystemDarkTheme =
@@ -39,6 +60,8 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+
+
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {

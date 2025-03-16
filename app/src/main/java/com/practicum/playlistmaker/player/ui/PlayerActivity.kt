@@ -2,29 +2,25 @@ package com.practicum.playlistmaker.player.ui
 
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.player.data.dto.PlayerStates
 import com.practicum.playlistmaker.player.presentation.PlayerUiState
 import com.practicum.playlistmaker.player.presentation.PlayerViewModel
-import com.practicum.playlistmaker.player.presentation.PlayerViewModelFactory
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
 
-    private val viewModel: PlayerViewModel by viewModels {
-        PlayerViewModelFactory(Creator.playerInteractor)
-    }
+    private val viewModel: PlayerViewModel by viewModel()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

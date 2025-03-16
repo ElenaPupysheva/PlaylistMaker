@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker.settings.domain
 
-import com.practicum.playlistmaker.settings.data.SettingsRepository
-
 class SettingsInteractorImpl(
     private val settingsRepository: SettingsRepository
 ) : SettingsInteractor {
