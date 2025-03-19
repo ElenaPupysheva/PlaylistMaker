@@ -12,9 +12,13 @@ import com.practicum.playlistmaker.di.interactorModule
 import com.practicum.playlistmaker.di.repositoryModule
 import com.practicum.playlistmaker.di.viewModelModule
 import com.practicum.playlistmaker.di.settingsModule
+import com.practicum.playlistmaker.media.presentation.FavoritesViewModel
+import com.practicum.playlistmaker.media.presentation.PlaylistsViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
 
 class App : Application(), KoinComponent {
@@ -34,8 +38,10 @@ class App : Application(), KoinComponent {
                 repositoryModule,
                 viewModelModule,
                 playerModule,
-                settingsModule
+                settingsModule,
+                mediaModule
             )
+
         }
         themePrefs = getSharedPreferences(PRACTICUM_PREFERENCES, MODE_PRIVATE)
 
@@ -79,4 +85,9 @@ class App : Application(), KoinComponent {
             }
         )
     }
+    val mediaModule = module {
+        viewModel { PlaylistsViewModel() }
+        viewModel { FavoritesViewModel() }
+    }
+
 }
