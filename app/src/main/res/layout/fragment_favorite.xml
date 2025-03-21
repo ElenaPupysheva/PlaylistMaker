@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        style="@style/errorNight"
+        android:id="@+id/noFavImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="106dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/mediaClean"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="242dp"
+        android:text="@string/media_clean">
+
+    </com.google.android.material.textview.MaterialTextView>
+
+</FrameLayout>

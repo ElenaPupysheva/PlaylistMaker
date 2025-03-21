@@ -197,5 +197,14 @@
         <item name="android:indeterminateTint">@color/progressBar</item>
     </style>
 
+    <style name="mediaClean">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:textSize">@dimen/text19sp</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
 
 </resources>

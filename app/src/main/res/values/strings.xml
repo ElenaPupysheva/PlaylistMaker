@@ -31,4 +31,10 @@
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
 
-    </resources>
+
+    <string name="mediatecha">Медиатека</string>
+    <string name="media_clean">Ваша медиатека пуста</string>
+    <string name="media_playlist">Вы не создали\nни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
+
+</resources>
