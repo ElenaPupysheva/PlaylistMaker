@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
 import com.practicum.playlistmaker.media.ui.MediaActivity
 import com.practicum.playlistmaker.search.ui.SearchActivity
-import com.practicum.playlistmaker.settings.ui.SettingsActivity
+import com.practicum.playlistmaker.settings.ui.SettingsFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.settingButton.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+            startActivity(Intent(this, SettingsFragment::class.java))
         }
     }
 }
