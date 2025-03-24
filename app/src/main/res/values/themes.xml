@@ -12,6 +12,7 @@
         <item name="colorControlActivated">@color/main_background</item>
         <item name="colorOnSurface">#D9DAE2</item>
         <item name="colorSurface">#AEAFB4</item>
+        <item name="android:statusBarColor">@color/main_background</item>
 
 
     </style>
