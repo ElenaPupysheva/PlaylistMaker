@@ -7,7 +7,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
 
 class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<TrackViewHolder>() {
-    interface OnTrackClickListener {
+    fun interface OnTrackClickListener {
         fun onTrackClick(track: Track)
     }
 

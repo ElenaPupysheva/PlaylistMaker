@@ -3,46 +3,44 @@ package com.practicum.playlistmaker.settings.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.practicum.playlistmaker.R
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.App
-import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivitySettingsBinding
+class SettingsFragment : Fragment() {
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-
-        viewModel.darkThemeEnabled.observe(this) { isEnabled ->
-            val app = applicationContext as App
+        viewModel.darkThemeEnabled.observe(viewLifecycleOwner) { isEnabled ->
+            val app = requireActivity().application as App
             if (app.darkTheme != isEnabled) {
                 app.switchTheme(isEnabled)
             }
             binding.themeSwitcher.isChecked = isEnabled
-
         }
 
         binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onThemeToggled(isChecked)
         }
-
 
         binding.appShare.setOnClickListener {
             val shareMessage = getString(R.string.link_course)
@@ -67,8 +65,17 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.userAgreement.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.link_agreement)))
+            val browserIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.link_agreement)))
             startActivity(browserIntent)
         }
+
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }
+

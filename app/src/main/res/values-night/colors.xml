@@ -11,6 +11,8 @@
     <color name="textplus">#FFFFFF</color>
     <color name="button_color">#1A1B22</color>
     <color name="progressBar">#3772E7</color>
+    <color name="selected">#3772E7</color>
+    <color name="unselected">#FFFFFF</color>
 
 
 </resources>
