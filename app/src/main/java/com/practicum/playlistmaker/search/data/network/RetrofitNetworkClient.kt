@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.search.data.network
 
 import com.practicum.playlistmaker.search.data.dto.TrackResponse
-import com.practicum.playlistmaker.search.data.dto.TrackSearchResponse
 import com.practicum.playlistmaker.search.data.dto.TracksSearchRequest
 
 class RetrofitNetworkClient(
