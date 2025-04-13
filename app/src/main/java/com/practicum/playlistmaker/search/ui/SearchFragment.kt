@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
@@ -17,6 +18,7 @@ import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.player.ui.PlayerActivity
 import com.practicum.playlistmaker.search.presentation.SearchViewModel
+import com.practicum.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -26,7 +28,8 @@ class SearchFragment : Fragment() {
 
     private val trackAdapter = TrackAdapter(mutableListOf())
     private val historyAdapter = TrackAdapter(mutableListOf())
-    private var isClickAllowed = true
+
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,8 +50,24 @@ class SearchFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = trackAdapter
 
-        trackAdapter.setOnTrackClickListener { track -> onTrackClick(track) }
-        historyAdapter.setOnTrackClickListener { track -> onTrackClick(track) }
+        onTrackClickDebounce = debounce<Track>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { track ->
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.putExtra(EXTRA_TRACK, Gson().toJson(track))
+            startActivity(intent)
+        }
+
+        val onTrackClick: (Track) -> Unit = { track ->
+            viewModel.onTrackClick(track)
+            onTrackClickDebounce(track)
+        }
+
+        trackAdapter.setOnTrackClickListener(onTrackClick)
+        historyAdapter.setOnTrackClickListener(onTrackClick)
+
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
@@ -112,24 +131,6 @@ class SearchFragment : Fragment() {
         binding.clearSearch.setOnClickListener {
             viewModel.clearHistory()
         }
-    }
-
-    private fun onTrackClick(track: Track) {
-        viewModel.onTrackClick(track)
-        if (clickDebounce()) {
-            val intent = Intent(requireContext(), PlayerActivity::class.java)
-            intent.putExtra(EXTRA_TRACK, Gson().toJson(track))
-            startActivity(intent)
-        }
-    }
-
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            binding.root.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
-            isClickAllowed = false
-        }
-        return current
     }
 
     override fun onDestroyView() {
