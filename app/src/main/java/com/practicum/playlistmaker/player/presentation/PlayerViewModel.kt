@@ -16,7 +16,7 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
 
     private val _uiState = MutableLiveData<PlayerUiState>(
         PlayerUiState(
-            playerState = PlayerState.Default,
+            playerState = PlayerState.Default(),
             currentTime = "0:00"
         )
     )
@@ -31,7 +31,7 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
             onPrepared = {
                 _uiState.postValue(
                     PlayerUiState(
-                        playerState = PlayerState.Prepared,
+                        playerState = PlayerState.Prepared(),
                         currentTime = "0:00"
                     )
                 )
@@ -40,7 +40,7 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
                 stopUpdatingProgress()
                 _uiState.postValue(
                     PlayerUiState(
-                        playerState = PlayerState.Prepared,
+                        playerState = PlayerState.Prepared(),
                         currentTime = "0:00"
                     )
                 )
@@ -50,20 +50,21 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
 
     fun startPlayer() {
         playerInteractor.startPlayer()
-        _uiState.value = _uiState.value?.copy(playerState = PlayerState.Playing)
+        _uiState.value = _uiState.value?.copy(playerState = PlayerState.Playing())
         startUpdatingProgress()
     }
 
     fun pausePlayer() {
         playerInteractor.pausePlayer()
-        _uiState.postValue(_uiState.value?.copy(playerState = PlayerState.Paused))
+        _uiState.postValue(_uiState.value?.copy(playerState = PlayerState.Paused()))
         stopUpdatingProgress()
     }
 
     fun playbackControl() {
         when (_uiState.value?.playerState) {
-            PlayerState.Playing -> pausePlayer()
-            PlayerState.Prepared, PlayerState.Paused -> startPlayer()
+            is PlayerState.Playing -> pausePlayer()
+            is PlayerState.Prepared,
+            is PlayerState.Paused -> startPlayer()
             else -> {}
         }
     }
