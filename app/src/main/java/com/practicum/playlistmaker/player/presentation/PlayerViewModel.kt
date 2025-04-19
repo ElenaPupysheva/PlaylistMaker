@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.player.data.dto.PlayerStates
+import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -15,27 +16,31 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
 
     private val _uiState = MutableLiveData<PlayerUiState>(
         PlayerUiState(
-            playerState = PlayerStates.DEFAULT,
+            playerState = PlayerState.Default(),
             currentTime = "0:00"
         )
     )
     val uiState: LiveData<PlayerUiState> = _uiState
 
-    private val updateInterval = 1000L
+    private val updateInterval = 300L
+    private var updateJob: Job? = null
 
     fun preparePlayer(url: String) {
         playerInteractor.preparePlayer(
             url = url,
             onPrepared = {
-                _uiState.value = _uiState.value?.copy(
-                    playerState = PlayerStates.PREPARED,
-                    currentTime = "0:00"
+                _uiState.postValue(
+                    PlayerUiState(
+                        playerState = PlayerState.Prepared(),
+                        currentTime = "0:00"
+                    )
                 )
             },
             onCompletion = {
+                stopUpdatingProgress()
                 _uiState.postValue(
                     PlayerUiState(
-                        playerState = PlayerStates.PREPARED,
+                        playerState = PlayerState.Prepared(),
                         currentTime = "0:00"
                     )
                 )
@@ -45,26 +50,35 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
 
     fun startPlayer() {
         playerInteractor.startPlayer()
-        _uiState.value = _uiState.value?.copy(playerState = PlayerStates.PLAYING)
+        _uiState.value = _uiState.value?.copy(playerState = PlayerState.Playing())
         startUpdatingProgress()
     }
 
     fun pausePlayer() {
         playerInteractor.pausePlayer()
-        _uiState.value = _uiState.value?.copy(playerState = PlayerStates.PAUSED)
+        _uiState.postValue(_uiState.value?.copy(playerState = PlayerState.Paused()))
+        stopUpdatingProgress()
     }
 
     fun playbackControl() {
         when (_uiState.value?.playerState) {
-            PlayerStates.PLAYING -> pausePlayer()
-            PlayerStates.PREPARED, PlayerStates.PAUSED -> startPlayer()
+            is PlayerState.Playing -> pausePlayer()
+            is PlayerState.Prepared,
+            is PlayerState.Paused -> startPlayer()
             else -> {}
         }
     }
 
+    private fun stopUpdatingProgress() {
+        updateJob?.cancel()
+        updateJob = null
+    }
+
     private fun startUpdatingProgress() {
-        viewModelScope.launch {
-            while (_uiState.value?.playerState == PlayerStates.PLAYING) {
+        stopUpdatingProgress()
+
+        updateJob = viewModelScope.launch {
+            while (playerInteractor.isPlaying()) {
                 val newTime = SimpleDateFormat("mm:ss", Locale.getDefault())
                     .format(playerInteractor.getCurrentPositionMs())
 
@@ -76,6 +90,7 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
 
     override fun onCleared() {
         super.onCleared()
+        stopUpdatingProgress()
         playerInteractor.releasePlayer()
     }
 }

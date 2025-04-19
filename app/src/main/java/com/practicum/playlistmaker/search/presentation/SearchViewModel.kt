@@ -5,9 +5,13 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.search.domain.api.HistoryInteractor
 import com.practicum.playlistmaker.search.domain.api.TracksInteractor
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 data class SearchUiState(
     val trackList: List<Track> = emptyList(),
@@ -53,21 +57,14 @@ class SearchViewModel (
         }
 
 
-        Thread {
-            val result = tracksInteractor.searchTracks(query)
-            handler.post {
-                if (result.isNotEmpty()) {
-                    updateState { current ->
-                        current.copy(
-                            isLoading = false,
-                            trackList = result,
-                            isError = false,
-                            showHistory = false
-                        )
-                    }
-                } else {
-                    updateState { current ->
-                        current.copy(
+        viewModelScope.launch {
+            tracksInteractor.searchTracks(query)
+                .onStart {
+                    updateState { it.copy(isLoading = true, isError = false) }
+                }
+                .catch {
+                    updateState {
+                        it.copy(
                             isLoading = false,
                             trackList = emptyList(),
                             isError = true,
@@ -75,8 +72,17 @@ class SearchViewModel (
                         )
                     }
                 }
-            }
-        }.start()
+                .collect { tracks ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            trackList = tracks,
+                            isError = tracks.isEmpty(),
+                            showHistory = false
+                        )
+                    }
+                }
+        }
     }
 
     fun onFocusGained() {

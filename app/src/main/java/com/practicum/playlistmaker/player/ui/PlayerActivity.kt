@@ -10,7 +10,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.player.data.dto.PlayerStates
+import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.presentation.PlayerUiState
 import com.practicum.playlistmaker.player.presentation.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -54,19 +54,22 @@ class PlayerActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { uiState: PlayerUiState ->
             when (uiState.playerState) {
-                PlayerStates.PREPARED -> {
+                is PlayerState.Prepared -> {
                     binding.playButton.isEnabled = true
                     binding.playButton.setImageResource(R.drawable.play_button)
                 }
-                PlayerStates.PLAYING -> {
+
+                is PlayerState.Playing -> {
                     binding.playButton.isEnabled = true
                     binding.playButton.setImageResource(R.drawable.pause_button)
                 }
-                PlayerStates.PAUSED -> {
+
+                is PlayerState.Paused -> {
                     binding.playButton.isEnabled = true
                     binding.playButton.setImageResource(R.drawable.play_button)
                 }
-                PlayerStates.DEFAULT -> {
+
+                is PlayerState.Default -> {
                     binding.playButton.isEnabled = false
                     binding.playButton.setImageResource(R.drawable.play_button)
                 }
@@ -75,6 +78,7 @@ class PlayerActivity : AppCompatActivity() {
             binding.musicTimeDuration.text = uiState.currentTime
         }
     }
+
 
     private fun bindTrackInfo(track: Track) {
         binding.apply {
