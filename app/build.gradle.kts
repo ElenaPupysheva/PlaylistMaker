@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-
 }
 
 android {
@@ -62,6 +61,8 @@ dependencies {
     implementation(libs.lifecycleRuntimeKtx)
     implementation(libs.androidxActivityKtx)
     implementation(libs.koinAndroid)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.appcompat)
 
 
 }
