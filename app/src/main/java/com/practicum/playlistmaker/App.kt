@@ -87,7 +87,7 @@ class App : Application(), KoinComponent {
     }
     val mediaModule = module {
         viewModel { PlaylistsViewModel() }
-        viewModel { FavoritesViewModel() }
+        viewModel { FavoritesViewModel(get()) }
     }
 
 }

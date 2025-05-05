@@ -21,7 +21,14 @@ class FavoritesInteractorImpl(
     }
 
     override suspend fun isInFavorites(trackId: Int): Boolean {
-        return FavoritesRepository.isInFavorites(trackId)
+        return repository.isInFavorites(trackId)
+    }
+
+    override fun observeIsFavorite(trackId: Int) = repository.observeIsFavorite(trackId)
+
+    override suspend fun toggle(track: Track) {
+        if (repository.isInFavorites(track.trackId)) repository.removeFromFavorites(track)
+        else repository.addToFavorites(track)
     }
 
 }

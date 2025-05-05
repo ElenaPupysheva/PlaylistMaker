@@ -19,7 +19,6 @@ import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
-
     private val viewModel: PlayerViewModel by viewModel()
 
 
@@ -35,6 +34,7 @@ class PlayerActivity : AppCompatActivity() {
         val track = Gson().fromJson(jsonTrack, Track::class.java) ?: return finish()
         val url = track.previewUrl ?: return finish()
 
+        viewModel.observeFavorite(track.trackId)
         viewModel.preparePlayer(url)
         bindTrackInfo(track)
 
@@ -45,6 +45,8 @@ class PlayerActivity : AppCompatActivity() {
         binding.toolbarPlayer.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+
+        binding.favoritesBtn.setOnClickListener { viewModel.onLikeClicked(track) }
     }
 
     private fun setupUI() {
@@ -77,7 +79,14 @@ class PlayerActivity : AppCompatActivity() {
 
             binding.musicTimeDuration.text = uiState.currentTime
         }
+        viewModel.isFavorite.observe(this) { liked -> setFavoriteButton(liked) }
     }
+
+    private fun setFavoriteButton(isFavorite: Boolean) {
+        val icon = if (isFavorite) R.drawable.like_button_enable else R.drawable.like_button
+        binding.favoritesBtn.setImageResource(icon)
+    }
+
 
 
     private fun bindTrackInfo(track: Track) {
