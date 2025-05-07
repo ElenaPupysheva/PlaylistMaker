@@ -1,24 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/favorites"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    style="@style/ScreenParam"
+    tools:context=".media.ui.FavoritesFragment">
 
-    <ImageView
-        style="@style/errorNight"
-        android:id="@+id/noFavImg"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/placeholder"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="106dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            style="@style/errorNight"
+            android:id="@+id/noFavImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/mediaClean"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="@string/media_clean" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="@dimen/size_44dp"
+        android:layout_height="@dimen/size_44dp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="106dp" />
+        android:layout_marginTop="140dp"
+        android:indeterminateTint="@color/progressBar"
+        android:visibility="gone" />
 
-    <com.google.android.material.textview.MaterialTextView
-        style="@style/mediaClean"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="242dp"
-        android:text="@string/media_clean">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerFavourite"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/us_padSt"
+        android:visibility="gone"
+        tools:listitem="@layout/track_list_view" />
 
-    </com.google.android.material.textview.MaterialTextView>
-
-</FrameLayout>
+</LinearLayout>

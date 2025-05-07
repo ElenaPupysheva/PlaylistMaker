@@ -4,15 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.media.domain.FavoritesInteractor
 import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewModel() {
+class PlayerViewModel(private val playerInteractor: PlayerInteractor,
+                      private val favoritesInteractor: FavoritesInteractor
+) : ViewModel() {
 
     private val _uiState = MutableLiveData<PlayerUiState>(
         PlayerUiState(
@@ -24,6 +29,8 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
 
     private val updateInterval = 300L
     private var updateJob: Job? = null
+    private val _isFavorite = MutableLiveData(false)
+    val isFavorite: LiveData<Boolean> = _isFavorite
 
     fun preparePlayer(url: String) {
         playerInteractor.preparePlayer(
@@ -93,4 +100,17 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
         stopUpdatingProgress()
         playerInteractor.releasePlayer()
     }
+
+    fun observeFavorite(trackId: Int) {
+        viewModelScope.launch {
+            favoritesInteractor.observeIsFavorite(trackId)
+                .collectLatest { fav -> _isFavorite.postValue(fav) }
+        }
+    }
+
+    fun onLikeClicked(track: Track) = viewModelScope.launch {
+        favoritesInteractor.toggle(track)
+    }
+
+
 }
