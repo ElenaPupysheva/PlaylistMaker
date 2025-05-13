@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".media.ui.NewPlaylistFragment"
+    android:id="@+id/newPlaylistFragment"
     style="@style/ScreenParam">
 
     <androidx.constraintlayout.widget.ConstraintLayout
