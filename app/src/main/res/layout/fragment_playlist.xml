@@ -26,5 +26,14 @@
         android:paddingTop="242dp"
         android:text="@string/media_playlist" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlistsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:layout_marginTop="80dp"
+        android:layout_gravity="center_horizontal" />
+
 
 </FrameLayout>
