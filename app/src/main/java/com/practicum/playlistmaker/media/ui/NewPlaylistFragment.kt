@@ -22,6 +22,12 @@ import com.practicum.playlistmaker.databinding.FragmentNewplaylistBinding
 import java.io.File
 import java.io.FileOutputStream
 import android.graphics.ImageDecoder
+import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.media.domain.PlaylistInteractor
+import org.koin.android.ext.android.inject
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 
 class NewPlaylistFragment : Fragment() {
 
@@ -30,6 +36,7 @@ class NewPlaylistFragment : Fragment() {
 
     private var isModified = false
     private var playlistName: String = ""
+    private val playlistInteractor: PlaylistInteractor by inject()
 
     private val pickMedia =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -88,14 +95,26 @@ class NewPlaylistFragment : Fragment() {
             binding.iconOverlay.visibility = View.VISIBLE
         }
 
+
         binding.createButton.setOnClickListener {
-            Toast.makeText(
-                requireContext(),
-                "Плейлист \"$playlistName\" создан",
-                Toast.LENGTH_SHORT
-            ).show()
-            isModified = false
-            parentFragmentManager.popBackStack()
+            val playlist = Playlist(
+                name = binding.editName.text.toString(),
+                description = binding.editDescription.text.toString(),
+                imagePath = getSavedImageFile().absolutePath,
+                trackIds = emptyList(),
+                trackCount = 0
+            )
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                playlistInteractor.savePlaylist(playlist)
+                Toast.makeText(
+                    requireContext(),
+                    "Плейлист \"${playlist.name}\" создан",
+                    Toast.LENGTH_SHORT
+                ).show()
+                isModified = false
+                parentFragmentManager.popBackStack()
+            }
         }
     }
 
