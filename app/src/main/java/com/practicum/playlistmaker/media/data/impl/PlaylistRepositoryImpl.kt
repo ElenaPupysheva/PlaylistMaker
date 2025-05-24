@@ -1,14 +1,18 @@
 package com.practicum.playlistmaker.media.data.impl
 
 import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.media.data.converters.PlaylistConvertor
+import com.practicum.playlistmaker.media.data.converters.toPlaylistTrackEntity
 import com.practicum.playlistmaker.media.data.db.PlaylistDao
 import com.practicum.playlistmaker.media.data.db.PlaylistEntity
+import com.practicum.playlistmaker.media.data.db.PlaylistTrackDao
 import com.practicum.playlistmaker.media.domain.PlaylistRepository
 
 
 class PlaylistRepositoryImpl(
     private val dao: PlaylistDao,
+    private val playlistTrackDao: PlaylistTrackDao
 
     ) : PlaylistRepository {
 
@@ -27,6 +31,10 @@ class PlaylistRepositoryImpl(
     override suspend fun getPlaylistById(id: Long): Playlist? {
         return dao.getPlaylistById(id)?.toDomain()
     }
+    override suspend fun saveTrackToPlaylistTracks(track: Track) {
+        playlistTrackDao.insertTrack(track.toPlaylistTrackEntity())
+    }
+
 
     private fun Playlist.toEntity(): PlaylistEntity {
         return PlaylistEntity(
@@ -49,4 +57,6 @@ class PlaylistRepositoryImpl(
             trackCount = trackCount
         )
     }
+
+
 }

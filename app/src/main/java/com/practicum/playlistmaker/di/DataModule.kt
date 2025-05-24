@@ -22,6 +22,8 @@ import org.koin.android.ext.koin.androidContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.practicum.playlistmaker.media.data.db.FavoriteDao
+import com.practicum.playlistmaker.media.data.db.PlaylistDao
+import com.practicum.playlistmaker.media.data.db.PlaylistTrackDao
 import com.practicum.playlistmaker.media.data.impl.FavoritesRepositoryImpl
 import com.practicum.playlistmaker.media.domain.FavoritesRepository
 
@@ -74,6 +76,13 @@ val dataModule = module {
     single { TrackConvertor() }
 
     single<FavoritesRepository> { FavoritesRepositoryImpl(get(), get()) }
+
+    single<PlaylistDao> {
+        get<AppDatabase>().playlistDao()
+    }
+
+    single<PlaylistTrackDao> { get<AppDatabase>().playlistTrackDao() }
+
 
 
 }

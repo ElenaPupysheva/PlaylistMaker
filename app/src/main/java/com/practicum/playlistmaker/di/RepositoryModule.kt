@@ -1,6 +1,9 @@
 package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.media.data.converters.TrackConvertor
+import com.practicum.playlistmaker.media.data.db.AppDatabase
+import com.practicum.playlistmaker.media.data.db.PlaylistDao
+import com.practicum.playlistmaker.media.data.db.PlaylistTrackDao
 import com.practicum.playlistmaker.media.data.impl.FavoritesRepositoryImpl
 import com.practicum.playlistmaker.media.data.impl.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.media.domain.FavoritesRepository
@@ -28,6 +31,14 @@ val repositoryModule = module {
     }
 
     single<PlaylistRepository> {
-        PlaylistRepositoryImpl(get())
+        PlaylistRepositoryImpl(
+            dao = get(),
+            playlistTrackDao = get()
+        )
     }
+
+    single<PlaylistDao> { get<AppDatabase>().playlistDao() }
+
+    single<PlaylistTrackDao> { get<AppDatabase>().playlistTrackDao() }
+
 }

@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.domain.models.Playlists
+import com.practicum.playlistmaker.domain.models.Playlist
 
-class PlaylistsAdapter(private val playlists: List<Playlists>) :
+class PlaylistsAdapter(private val playlists: List<Playlist>) :
     RecyclerView.Adapter<PlaylistsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistsViewHolder {

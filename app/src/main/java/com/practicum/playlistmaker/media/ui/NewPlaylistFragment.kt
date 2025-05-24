@@ -22,6 +22,7 @@ import com.practicum.playlistmaker.databinding.FragmentNewplaylistBinding
 import java.io.File
 import java.io.FileOutputStream
 import android.graphics.ImageDecoder
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.media.domain.PlaylistInteractor
 import org.koin.android.ext.android.inject
@@ -115,6 +116,9 @@ class NewPlaylistFragment : Fragment() {
                 isModified = false
                 parentFragmentManager.popBackStack()
             }
+            requireActivity().findViewById<View>(R.id.newPlaylistContainer).visibility = View.GONE
+
+
         }
     }
 
@@ -131,6 +135,8 @@ class NewPlaylistFragment : Fragment() {
         } else {
             parentFragmentManager.popBackStack()
         }
+        requireActivity().findViewById<View>(R.id.newPlaylistContainer).visibility = View.GONE
+
     }
 
     private fun saveImageToPrivateStorage(uri: Uri) {
