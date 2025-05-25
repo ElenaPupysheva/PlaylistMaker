@@ -80,32 +80,56 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="16dp" />
 
-        <EditText
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:id="@+id/edit_name"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="16dp"
-            android:padding="8dp"
             android:hint="Название*"
-            android:background="@drawable/input_rectangle"
-            android:textColor="#1A1B22"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="true"
+            app:boxStrokeColor="@color/input_stroke_selector"
+            app:hintTextColor="@color/input_stroke_selector"
             app:layout_constraintTop_toBottomOf="@id/imageFrame"
             app:layout_constraintStart_toStartOf="@id/add_guideline"
-            app:layout_constraintEnd_toEndOf="@id/add_end_guideline" />
+            app:layout_constraintEnd_toEndOf="@id/add_end_guideline">
 
-        <EditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_name_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                app:boxStrokeColor="@color/input_stroke_selector"
+                app:hintTextColor="@color/input_stroke_selector"
+                android:maxLines="1"
+                android:textColor="@color/textplus" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edit_description"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:padding="8dp"
             android:hint="Описание"
-            android:background="@drawable/input_rectangle"
-            android:textColor="#1A1B22"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/input_stroke_selector"
+            app:hintTextColor="@color/input_stroke_selector"
             app:layout_constraintTop_toBottomOf="@id/edit_name"
             app:layout_constraintStart_toStartOf="@id/add_guideline"
-            app:layout_constraintEnd_toEndOf="@id/add_end_guideline" />
+            app:layout_constraintEnd_toEndOf="@id/add_end_guideline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_description_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                app:boxStrokeColor="@color/input_stroke_selector"
+                app:hintTextColor="@color/input_stroke_selector"
+                android:textColor="@color/textplus" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/createButton"

@@ -23,7 +23,7 @@ class BottomSheetPlaylistsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BottomSheetViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.bottomsheet_view, parent, false)
+            .inflate(R.layout.item_bottomsheet_playlist, parent, false)
         return BottomSheetViewHolder(view)
     }
 

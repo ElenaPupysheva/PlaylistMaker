@@ -38,13 +38,14 @@ class NewPlaylistFragment : Fragment() {
     private var isModified = false
     private var playlistName: String = ""
     private val playlistInteractor: PlaylistInteractor by inject()
+    private var savedImagePath: String? = null
 
-    private val pickMedia =
+    val pickMedia =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 binding.musicTrackCover.setImageURI(uri)
                 binding.iconOverlay.visibility = View.GONE
-                saveImageToPrivateStorage(uri)
+                savedImagePath = saveImageToPrivateStorage(uri)
                 isModified = true
             } else {
                 Log.d("PhotoPicker", "No media selected")
@@ -61,14 +62,18 @@ class NewPlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        savedImagePath = null
+        binding.musicTrackCover.setImageResource(R.drawable.rounded_rectangle)
+        binding.iconOverlay.visibility = View.VISIBLE
 
-        binding.editName.doOnTextChanged { text, _, _, _ ->
+        binding.editNameField.doOnTextChanged { text, _, _, _ ->
             binding.createButton.isEnabled = !text.isNullOrBlank()
             isModified = true
             playlistName = text.toString()
+
         }
 
-        binding.editDescription.doOnTextChanged { _, _, _, _ ->
+        binding.editDescriptionField.doOnTextChanged { _, _, _, _ ->
             isModified = true
         }
 
@@ -88,20 +93,12 @@ class NewPlaylistFragment : Fragment() {
                 }
             })
 
-        val savedFile = getSavedImageFile()
-        if (savedFile.exists()) {
-            binding.musicTrackCover.setImageURI(savedFile.toUri())
-            binding.iconOverlay.visibility = View.GONE
-        } else {
-            binding.iconOverlay.visibility = View.VISIBLE
-        }
-
 
         binding.createButton.setOnClickListener {
             val playlist = Playlist(
-                name = binding.editName.text.toString(),
-                description = binding.editDescription.text.toString(),
-                imagePath = getSavedImageFile().absolutePath,
+                name = binding.editNameField.text.toString(),
+                description = binding.editDescriptionField.text.toString(),
+                imagePath = savedImagePath ?: "",
                 trackIds = emptyList(),
                 trackCount = 0
             )
@@ -116,8 +113,6 @@ class NewPlaylistFragment : Fragment() {
                 isModified = false
                 parentFragmentManager.popBackStack()
             }
-            requireActivity().findViewById<View>(R.id.newPlaylistContainer).visibility = View.GONE
-
 
         }
     }
@@ -135,31 +130,29 @@ class NewPlaylistFragment : Fragment() {
         } else {
             parentFragmentManager.popBackStack()
         }
-        requireActivity().findViewById<View>(R.id.newPlaylistContainer).visibility = View.GONE
 
     }
 
-    private fun saveImageToPrivateStorage(uri: Uri) {
-        try {
-            val context = requireContext()
-            val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val source = ImageDecoder.createSource(context.contentResolver, uri)
-                ImageDecoder.decodeBitmap(source)
-            } else {
-                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-            }
-
-            val imageFile = getSavedImageFile()
-            imageFile.parentFile?.mkdirs()
-
-            FileOutputStream(imageFile).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
-            }
-
-            Log.d("PhotoSave", "Image saved: ${imageFile.absolutePath}")
-        } catch (e: Exception) {
-            Log.e("PhotoSave", "Failed to save image: ${e.message}", e)
+    private fun saveImageToPrivateStorage(uri: Uri): String {
+        val context = requireContext()
+        val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source)
+        } else {
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         }
+
+        val fileName = "playlist_cover_${System.currentTimeMillis()}.jpg"
+        val dir = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
+        if (!dir.exists()) dir.mkdirs()
+        val imageFile = File(dir, fileName)
+
+        FileOutputStream(imageFile).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+        }
+
+        Log.d("PhotoSave", "Image saved: ${imageFile.absolutePath}")
+        return imageFile.absolutePath
     }
 
     private fun getSavedImageFile(): File {

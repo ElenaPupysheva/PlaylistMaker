@@ -13,6 +13,12 @@ val viewModelModule = module {
     viewModel {
         FavoritesViewModel(favoritesInteractor = get())
     }
-    viewModel {PlayerViewModel(get(), get()) }
+    viewModel {
+        PlayerViewModel(
+            playerInteractor = get(),
+            favoritesInteractor = get(),
+            playlistInteractor = get()
+        )
+    }
 
 }

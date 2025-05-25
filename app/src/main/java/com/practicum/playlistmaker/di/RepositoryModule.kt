@@ -32,7 +32,7 @@ val repositoryModule = module {
 
     single<PlaylistRepository> {
         PlaylistRepositoryImpl(
-            dao = get(),
+            playlistDao = get(),
             playlistTrackDao = get()
         )
     }

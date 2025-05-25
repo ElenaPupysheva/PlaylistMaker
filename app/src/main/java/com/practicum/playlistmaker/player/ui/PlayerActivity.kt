@@ -4,8 +4,12 @@ import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -19,7 +23,6 @@ import com.practicum.playlistmaker.media.ui.NewPlaylistFragment
 import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.presentation.PlayerUiState
 import com.practicum.playlistmaker.player.presentation.PlayerViewModel
-import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
@@ -49,6 +52,28 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.observeFavorite(currentTrack.trackId)
         viewModel.preparePlayer(url)
         bindTrackInfo(currentTrack)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+        viewModel.playlists
+            .onEach { playlists ->
+
+                println("DEBUG: Получено плейлистов: ${playlists.size}")
+                playlists.forEach {
+                    println("DEBUG: Плейлист: ${it.name}, ID: ${it.id}, треков: ${it.trackCount}")
+                }
+
+                bottomSheetAdapter = BottomSheetPlaylistsAdapter(
+                    playlists = playlists,
+                    currentTrack = currentTrack,
+                    playlistInteractor = playlistInteractor,
+                    bottomSheetBehavior = bottomSheetBehavior
+                )
+                binding.playlistsRecyclerBottomSheet.adapter = bottomSheetAdapter
+                binding.playlistsRecyclerBottomSheet.layoutManager =
+                    LinearLayoutManager(this@PlayerActivity)
+            }
+            .launchIn(lifecycleScope)
 
         binding.playButton.setOnClickListener {
             viewModel.playbackControl()
@@ -61,16 +86,12 @@ class PlayerActivity : AppCompatActivity() {
         binding.favoritesBtn.setOnClickListener { viewModel.onLikeClicked(currentTrack) }
 
         binding.addButton.setOnClickListener {
-            showBottomSheet()
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
         binding.createPlaylistButton.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             openNewPlaylistFragment()
-        }
-
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
-            state = BottomSheetBehavior.STATE_HIDDEN
         }
 
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -84,24 +105,15 @@ class PlayerActivity : AppCompatActivity() {
                 binding.overlay.alpha = (0.0f).coerceAtLeast(slideOffset.coerceAtMost(1.0f))
             }
         })
-    }
 
-    private fun showBottomSheet() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val playlists = playlistInteractor.getAllPlaylists()
-
-            withContext(Dispatchers.Main) {
-                bottomSheetAdapter = BottomSheetPlaylistsAdapter(
-                    playlists = playlists,
-                    currentTrack = currentTrack,
-                    playlistInteractor = playlistInteractor,
-                    bottomSheetBehavior = bottomSheetBehavior
-                )
-                binding.playlistsRecyclerBottomSheet.adapter = bottomSheetAdapter
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (supportFragmentManager.backStackEntryCount == 0) {
+                binding.newPlaylistContainer.visibility = View.GONE
             }
         }
+
     }
+
 
     private fun openNewPlaylistFragment() {
         supportFragmentManager.beginTransaction()

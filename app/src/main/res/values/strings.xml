@@ -38,4 +38,6 @@
     <string name="new_playlist">Новый плейлист</string>
     <string name="create">Создать</string>
 
+    <string name="add_toplaylist">Добавить в плейлист</string>
+
 </resources>

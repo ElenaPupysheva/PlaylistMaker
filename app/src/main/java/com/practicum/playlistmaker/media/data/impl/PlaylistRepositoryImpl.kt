@@ -8,31 +8,41 @@ import com.practicum.playlistmaker.media.data.db.PlaylistDao
 import com.practicum.playlistmaker.media.data.db.PlaylistEntity
 import com.practicum.playlistmaker.media.data.db.PlaylistTrackDao
 import com.practicum.playlistmaker.media.domain.PlaylistRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 
 class PlaylistRepositoryImpl(
-    private val dao: PlaylistDao,
+    private val playlistDao: PlaylistDao,
     private val playlistTrackDao: PlaylistTrackDao
+) : PlaylistRepository {
 
-    ) : PlaylistRepository {
+    private val playlistConvertor = PlaylistConvertor()
 
     override suspend fun addPlaylist(playlist: Playlist) {
-        dao.insertPlaylist(playlist.toEntity())
+        playlistDao.insertPlaylist(playlist.toEntity())
     }
 
     override suspend fun updatePlaylist(playlist: Playlist) {
-        dao.updatePlaylist(playlist.toEntity())
+        playlistDao.updatePlaylist(playlist.toEntity())
     }
 
     override suspend fun getPlaylists(): List<Playlist> {
-        return dao.getAllPlaylists().map { it.toDomain() }
+        return playlistDao.getAllPlaylists().map { it.toDomain() }
     }
 
     override suspend fun getPlaylistById(id: Long): Playlist? {
-        return dao.getPlaylistById(id)?.toDomain()
+        return playlistDao.getPlaylistById(id)?.toDomain()
     }
+
     override suspend fun saveTrackToPlaylistTracks(track: Track) {
         playlistTrackDao.insertTrack(track.toPlaylistTrackEntity())
+    }
+
+    override fun getPlaylistsFlow(): Flow<List<Playlist>> {
+        return playlistDao.getAllPlaylistsFlow().map { entities ->
+            entities.map { it.toDomain() }
+        }
     }
 
 
@@ -42,7 +52,7 @@ class PlaylistRepositoryImpl(
             name = name,
             description = description,
             imagePath = imagePath,
-            trackIdsJson = PlaylistConvertor().fromList(trackIds),
+            trackIdsJson = playlistConvertor.fromList(trackIds),
             trackCount = trackCount
         )
     }
@@ -53,10 +63,8 @@ class PlaylistRepositoryImpl(
             name = name,
             description = description,
             imagePath = imagePath,
-            trackIds = PlaylistConvertor().toList(trackIdsJson),
+            trackIds = playlistConvertor.toList(trackIdsJson),
             trackCount = trackCount
         )
     }
-
-
 }

@@ -8,6 +8,7 @@ import androidx.room.Update
 
 @Dao
 interface PlaylistDao {
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaylist(playlist: PlaylistEntity)
 
@@ -16,6 +17,9 @@ interface PlaylistDao {
 
     @Query("SELECT * FROM playlists")
     suspend fun getAllPlaylists(): List<PlaylistEntity>
+
+    @Query("SELECT * FROM playlists")
+    fun getAllPlaylistsFlow(): kotlinx.coroutines.flow.Flow<List<PlaylistEntity>> // 👈 ЭТО ВАЖНО
 
     @Query("SELECT * FROM playlists WHERE id = :id")
     suspend fun getPlaylistById(id: Long): PlaylistEntity?

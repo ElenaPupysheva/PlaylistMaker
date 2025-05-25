@@ -20,4 +20,7 @@
     <color name="progressBar">#3772E7</color>
     <color name="selected">#3772E7</color>
     <color name="unselected">#1A1B22</color>
+    <color name="blue_primary">#3772E7</color>
+
+
 </resources>

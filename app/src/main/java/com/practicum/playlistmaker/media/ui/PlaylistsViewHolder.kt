@@ -1,27 +1,33 @@
 package com.practicum.playlistmaker.media.ui
 
-import android.net.Uri
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.PlaylistViewBinding
 import com.practicum.playlistmaker.domain.models.Playlist
+import java.io.File
 
-
-class PlaylistsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
-    private val title: TextView = itemView.findViewById(R.id.title)
-    private val description: TextView = itemView.findViewById(R.id.description)
-    private val playlistPicture: ImageView = itemView.findViewById(R.id.playlistPicture)
+class PlaylistsViewHolder(private val binding: PlaylistViewBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun bind(playlist: Playlist) {
-        title.text = playlist.name
-        description.text = playlist.description
+        binding.title.text = playlist.name
+
+        val context = binding.root.context
+        val count = playlist.trackCount
+        binding.trackCount.text = context.resources.getQuantityString(
+            R.plurals.tracks_count, count, count
+        )
+
         if (playlist.imagePath.isNotEmpty()) {
-            playlistPicture.setImageURI(Uri.parse(playlist.imagePath))
+            val file = File(playlist.imagePath)
+            Glide.with(context)
+                .load(file)
+                .placeholder(R.drawable.placeholder)
+                .centerCrop()
+                .into(binding.playlistPicture)
         } else {
-            playlistPicture.setImageResource(R.drawable.placeholder)
+            binding.playlistPicture.setImageResource(R.drawable.placeholder)
         }
     }
 }
