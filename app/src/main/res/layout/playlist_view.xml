@@ -6,7 +6,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginStart="16dp"
     android:layout_marginBottom="16dp"
     android:gravity="center">
 
@@ -16,7 +15,7 @@
             android:layout_height="160dp"
             android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/RoundedImageStyle"
-            android:src="@drawable/placeholder" />
+            app:srcCompat="@drawable/placeholder" />
 
         <TextView
             android:id="@+id/title"
