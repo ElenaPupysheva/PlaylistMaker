@@ -39,5 +39,8 @@
     <string name="create">Создать</string>
 
     <string name="add_toplaylist">Добавить в плейлист</string>
-
+    <string name="cancel">Отмена</string>
+    <string name="areDone">Завершить создание плейлиста?</string>
+    <string name="lostData">Все несохраненные данные будут потеряны</string>
+    <string name="finish">Завершить</string>
 </resources>

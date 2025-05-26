@@ -2,8 +2,8 @@ package com.practicum.playlistmaker.media.ui
 
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Bundle
 import android.os.Build
+import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
@@ -29,27 +29,25 @@ import org.koin.android.ext.android.inject
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-
 class NewPlaylistFragment : Fragment() {
 
     private var _binding: FragmentNewplaylistBinding? = null
-    private val binding get() = _binding!!
+    private val playlistInteractor: PlaylistInteractor by inject()
 
     private var isModified = false
     private var playlistName: String = ""
-    private val playlistInteractor: PlaylistInteractor by inject()
     private var savedImagePath: String? = null
 
-    val pickMedia =
+    private val pickMedia =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            if (uri != null) {
+            uri?.let {
+                _binding?.let { binding ->
                 binding.musicTrackCover.setImageURI(uri)
                 binding.iconOverlay.visibility = View.GONE
+                }
                 savedImagePath = saveImageToPrivateStorage(uri)
                 isModified = true
-            } else {
-                Log.d("PhotoPicker", "No media selected")
-            }
+            } ?: Log.d("PhotoPicker", "No media selected")
         }
 
     override fun onCreateView(
@@ -57,80 +55,80 @@ class NewPlaylistFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentNewplaylistBinding.inflate(inflater, container, false)
-        return binding.root
+        return _binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        savedImagePath = null
-        binding.musicTrackCover.setImageResource(R.drawable.rounded_rectangle)
-        binding.iconOverlay.visibility = View.VISIBLE
 
-        binding.editNameField.doOnTextChanged { text, _, _, _ ->
-            binding.createButton.isEnabled = !text.isNullOrBlank()
-            isModified = true
-            playlistName = text.toString()
+        _binding?.let { binding ->
+            savedImagePath = null
+            binding.musicTrackCover.setImageResource(R.drawable.rounded_rectangle)
+            binding.iconOverlay.visibility = View.VISIBLE
 
-        }
-
-        binding.editDescriptionField.doOnTextChanged { _, _, _, _ ->
-            isModified = true
-        }
-
-        binding.imageFrame.setOnClickListener {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        }
-
-        binding.toolbar.setNavigationOnClickListener {
-            handleExit()
-        }
-
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    handleExit()
-                }
-            })
-
-
-        binding.createButton.setOnClickListener {
-            val playlist = Playlist(
-                name = binding.editNameField.text.toString(),
-                description = binding.editDescriptionField.text.toString(),
-                imagePath = savedImagePath ?: "",
-                trackIds = emptyList(),
-                trackCount = 0
-            )
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                playlistInteractor.savePlaylist(playlist)
-                Toast.makeText(
-                    requireContext(),
-                    "Плейлист \"${playlist.name}\" создан",
-                    Toast.LENGTH_SHORT
-                ).show()
-                isModified = false
-                parentFragmentManager.popBackStack()
+            binding.editNameField.doOnTextChanged { text, _, _, _ ->
+                binding.createButton.isEnabled = !text.isNullOrBlank()
+                isModified = true
+                playlistName = text.toString()
             }
 
+            binding.editDescriptionField.doOnTextChanged { _, _, _, _ ->
+                isModified = true
+            }
+
+            binding.imageFrame.setOnClickListener {
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }
+
+            binding.toolbar.setNavigationOnClickListener {
+                handleExit()
+            }
+
+            requireActivity().onBackPressedDispatcher.addCallback(
+                viewLifecycleOwner,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        handleExit()
+                    }
+                }
+            )
+
+            binding.createButton.setOnClickListener {
+                val playlist = Playlist(
+                    name = binding.editNameField.text.toString(),
+                    description = binding.editDescriptionField.text.toString(),
+                    imagePath = savedImagePath ?: "",
+                    trackIds = emptyList(),
+                    trackCount = 0
+                )
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    playlistInteractor.savePlaylist(playlist)
+                    Toast.makeText(
+                        requireContext(),
+                        "Плейлист \"${playlist.name}\" создан",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    isModified = false
+                    parentFragmentManager.popBackStack()
+                }
+            }
         }
     }
 
     private fun handleExit() {
         if (isModified) {
             MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Завершить создание плейлиста?")
-                .setMessage("Все несохраненные данные будут потеряны")
-                .setNegativeButton("Отмена", null)
-                .setPositiveButton("Завершить") { _, _ ->
+                .setTitle(R.string.areDone)
+                .setMessage(R.string.lostData)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.finish) { _, _ ->
                     parentFragmentManager.popBackStack()
                 }
                 .show()
         } else {
             parentFragmentManager.popBackStack()
         }
-
     }
 
     private fun saveImageToPrivateStorage(uri: Uri): String {
@@ -151,14 +149,7 @@ class NewPlaylistFragment : Fragment() {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
         }
 
-        Log.d("PhotoSave", "Image saved: ${imageFile.absolutePath}")
         return imageFile.absolutePath
-    }
-
-    private fun getSavedImageFile(): File {
-        val dir =
-            File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
-        return File(dir, "first_cover.jpg")
     }
 
     override fun onDestroyView() {
@@ -167,8 +158,6 @@ class NewPlaylistFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(): NewPlaylistFragment {
-            return NewPlaylistFragment()
-        }
+        fun newInstance(): NewPlaylistFragment = NewPlaylistFragment()
     }
 }

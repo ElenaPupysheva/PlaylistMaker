@@ -19,7 +19,7 @@ interface PlaylistDao {
     suspend fun getAllPlaylists(): List<PlaylistEntity>
 
     @Query("SELECT * FROM playlists")
-    fun getAllPlaylistsFlow(): kotlinx.coroutines.flow.Flow<List<PlaylistEntity>> // 👈 ЭТО ВАЖНО
+    fun getAllPlaylistsFlow(): kotlinx.coroutines.flow.Flow<List<PlaylistEntity>>
 
     @Query("SELECT * FROM playlists WHERE id = :id")
     suspend fun getPlaylistById(id: Long): PlaylistEntity?
