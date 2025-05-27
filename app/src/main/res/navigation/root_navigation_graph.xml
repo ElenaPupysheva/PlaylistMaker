@@ -32,4 +32,21 @@
         android:name="com.practicum.playlistmaker.settings.ui.SettingsFragment"
         android:label="settings_fragment"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/playlistFragment"
+        android:name="com.practicum.playlistmaker.media.ui.PlaylistFragment"
+        android:label="fragment_playlist"
+        tools:layout="@layout/fragment_playlist">
+
+        <action
+            android:id="@+id/action_playlist_to_newPlaylist"
+            app:destination="@id/newPlaylistFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/newPlaylistFragment"
+        android:name="com.practicum.playlistmaker.media.ui.NewPlaylistFragment"
+        tools:layout="@layout/fragment_newplaylist" />
+
 </navigation>

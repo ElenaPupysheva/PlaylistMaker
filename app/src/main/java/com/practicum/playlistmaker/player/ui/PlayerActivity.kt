@@ -2,25 +2,40 @@ package com.practicum.playlistmaker.player.ui
 
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.media.domain.PlaylistInteractor
+import com.practicum.playlistmaker.media.ui.NewPlaylistFragment
 import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.presentation.PlayerUiState
 import com.practicum.playlistmaker.player.presentation.PlayerViewModel
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private val viewModel: PlayerViewModel by viewModel()
+    private val playlistInteractor: PlaylistInteractor by inject()
 
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetAdapter: BottomSheetPlaylistsAdapter
+
+    private lateinit var currentTrack: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,12 +46,34 @@ class PlayerActivity : AppCompatActivity() {
         observeViewModel()
 
         val jsonTrack = intent.getStringExtra(EXTRA_TRACK) ?: return finish()
-        val track = Gson().fromJson(jsonTrack, Track::class.java) ?: return finish()
-        val url = track.previewUrl ?: return finish()
+        currentTrack = Gson().fromJson(jsonTrack, Track::class.java) ?: return finish()
+        val url = currentTrack.previewUrl ?: return finish()
 
-        viewModel.observeFavorite(track.trackId)
+        viewModel.observeFavorite(currentTrack.trackId)
         viewModel.preparePlayer(url)
-        bindTrackInfo(track)
+        bindTrackInfo(currentTrack)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+        viewModel.playlists
+            .onEach { playlists ->
+
+                println("DEBUG: Получено плейлистов: ${playlists.size}")
+                playlists.forEach {
+                    println("DEBUG: Плейлист: ${it.name}, ID: ${it.id}, треков: ${it.trackCount}")
+                }
+
+                bottomSheetAdapter = BottomSheetPlaylistsAdapter(
+                    playlists = playlists,
+                    currentTrack = currentTrack,
+                    playlistInteractor = playlistInteractor,
+                    bottomSheetBehavior = bottomSheetBehavior
+                )
+                binding.playlistsRecyclerBottomSheet.adapter = bottomSheetAdapter
+                binding.playlistsRecyclerBottomSheet.layoutManager =
+                    LinearLayoutManager(this@PlayerActivity)
+            }
+            .launchIn(lifecycleScope)
 
         binding.playButton.setOnClickListener {
             viewModel.playbackControl()
@@ -46,7 +83,44 @@ class PlayerActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        binding.favoritesBtn.setOnClickListener { viewModel.onLikeClicked(track) }
+        binding.favoritesBtn.setOnClickListener { viewModel.onLikeClicked(currentTrack) }
+
+        binding.addButton.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+
+        binding.createPlaylistButton.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            openNewPlaylistFragment()
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                binding.overlay.visibility =
+                    if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE else View.VISIBLE
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.overlay.alpha = (0.0f).coerceAtLeast(slideOffset.coerceAtMost(1.0f))
+            }
+        })
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (supportFragmentManager.backStackEntryCount == 0) {
+                binding.newPlaylistContainer.visibility = View.GONE
+            }
+        }
+
+    }
+
+
+    private fun openNewPlaylistFragment() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.newPlaylistContainer, NewPlaylistFragment())
+            .addToBackStack(null)
+            .commit()
+        binding.newPlaylistContainer.visibility = View.VISIBLE
     }
 
     private fun setupUI() {
@@ -86,8 +160,6 @@ class PlayerActivity : AppCompatActivity() {
         val icon = if (isFavorite) R.drawable.like_button_enable else R.drawable.like_button
         binding.favoritesBtn.setImageResource(icon)
     }
-
-
 
     private fun bindTrackInfo(track: Track) {
         binding.apply {

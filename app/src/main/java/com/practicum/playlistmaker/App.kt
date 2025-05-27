@@ -3,7 +3,7 @@ package com.practicum.playlistmaker
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import android.content.SharedPreferences
-
+import com.practicum.playlistmaker.media.presentation.PlaylistsViewModel
 import com.practicum.playlistmaker.domain.models.PRACTICUM_PREFERENCES
 import com.practicum.playlistmaker.domain.models.SWITCH_KEY
 import com.practicum.playlistmaker.di.playerModule
@@ -13,7 +13,7 @@ import com.practicum.playlistmaker.di.repositoryModule
 import com.practicum.playlistmaker.di.viewModelModule
 import com.practicum.playlistmaker.di.settingsModule
 import com.practicum.playlistmaker.media.presentation.FavoritesViewModel
-import com.practicum.playlistmaker.media.presentation.PlaylistsViewModel
+
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.component.KoinComponent
@@ -86,7 +86,7 @@ class App : Application(), KoinComponent {
         )
     }
     val mediaModule = module {
-        viewModel { PlaylistsViewModel() }
+        viewModel { PlaylistsViewModel(get()) }
         viewModel { FavoritesViewModel(get()) }
     }
 

@@ -1,0 +1,150 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".media.ui.NewPlaylistFragment"
+    android:id="@+id/newPlaylistFragment"
+    style="@style/ScreenParam">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="32dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            app:iconGravity="textStart"
+            app:navigationIcon="@drawable/back"
+            app:title="@string/new_playlist"
+            app:titleTextColor="?attr/colorOnSecondary"
+            app:fontFamily="@font/ys_display_medium"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/start_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="24dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/end_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="24dp" />
+
+        <FrameLayout
+            android:id="@+id/imageFrame"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="26dp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintStart_toStartOf="@id/start_guideline"
+            app:layout_constraintEnd_toEndOf="@id/end_guideline"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toTopOf="@id/edit_name">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/musicTrackCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/albumCover"
+                app:shapeAppearance="@style/RoundedImageStyle"
+                app:srcCompat="@drawable/rounded_rectangle" />
+
+            <ImageView
+                android:id="@+id/iconOverlay"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:shapeAppearance="@style/RoundedImageStyle"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/add_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/add_end_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="16dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:id="@+id/edit_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
+            android:hint="Название*"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="true"
+            app:boxStrokeColor="@color/input_stroke_selector"
+            app:hintTextColor="@color/input_stroke_selector"
+            app:layout_constraintTop_toBottomOf="@id/imageFrame"
+            app:layout_constraintStart_toStartOf="@id/add_guideline"
+            app:layout_constraintEnd_toEndOf="@id/add_end_guideline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_name_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                app:boxStrokeColor="@color/input_stroke_selector"
+                app:hintTextColor="@color/input_stroke_selector"
+                android:maxLines="1"
+                android:textColor="@color/textplus" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edit_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Описание"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/input_stroke_selector"
+            app:hintTextColor="@color/input_stroke_selector"
+            app:layout_constraintTop_toBottomOf="@id/edit_name"
+            app:layout_constraintStart_toStartOf="@id/add_guideline"
+            app:layout_constraintEnd_toEndOf="@id/add_end_guideline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_description_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                app:boxStrokeColor="@color/input_stroke_selector"
+                app:hintTextColor="@color/input_stroke_selector"
+                android:textColor="@color/textplus" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/createButton"
+            style="@style/createButton"
+            android:layout_width="0dp"
+            android:layout_marginTop="170dp"
+            android:layout_marginBottom="32dp"
+            android:padding="12.5dp"
+            android:text="@string/create"
+            android:background="@drawable/ic_create"
+            android:enabled="false"
+            android:clickable="true"
+            app:layout_constraintTop_toBottomOf="@id/edit_description"
+            app:layout_constraintStart_toStartOf="@id/add_guideline"
+            app:layout_constraintEnd_toEndOf="@id/add_end_guideline" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
