@@ -41,6 +41,7 @@
 
         <action
             android:id="@+id/action_playlist_to_newPlaylist"
+
             app:destination="@id/newPlaylistFragment" />
     </fragment>
 
