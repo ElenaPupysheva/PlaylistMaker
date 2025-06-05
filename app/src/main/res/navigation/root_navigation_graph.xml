@@ -50,4 +50,21 @@
         android:name="com.practicum.playlistmaker.media.ui.NewPlaylistFragment"
         tools:layout="@layout/fragment_newplaylist" />
 
+    <fragment
+        android:id="@+id/detailedFragment"
+        android:name="com.practicum.playlistmaker.media.ui.DetailedFragment"
+        android:label="fragment_detailed"
+        tools:layout="@layout/fragment_detailed_playlist">
+
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
+
+        <action
+            android:id="@+id/action_playlistFragment_to_detailedFragment"
+            app:destination="@id/detailedFragment" />
+
+    </fragment>
+
+
 </navigation>
