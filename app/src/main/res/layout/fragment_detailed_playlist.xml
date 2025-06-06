@@ -54,6 +54,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/musicTrackName"
             style="@style/musicTrackName"
+            android:fontWeight="700"
+            android:textColor="#1A1B22"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/top_mar"
@@ -66,7 +68,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/playerYear"
-            style="@style/groupTrackName"
+            style="@style/DetailedText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -88,7 +90,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/totalTime"
-                style="@style/ArtistBar"
+                style="@style/DetailedText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="300 минут"
@@ -101,7 +103,7 @@
                 android:layout_width="@dimen/size_13dp"
                 android:layout_height="@dimen/size_13dp"
                 android:src="@drawable/ic"
-
+                android:tint="#1A1B22"
                 android:layout_marginEnd="4dp"
                 app:layout_constraintStart_toEndOf="@id/totalTime"
                 app:layout_constraintTop_toTopOf="parent"
@@ -109,7 +111,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/totalTracks"
-                style="@style/ArtistBar"
+                style="@style/DetailedText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="98 треков"
@@ -130,10 +132,10 @@
             app:layout_constraintTop_toBottomOf="@id/dataField">
 
             <ImageView
-                android:id="@+id/shareButtton"
+                android:id="@+id/shareButton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/share"
+                android:src="@drawable/button_share"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
@@ -142,16 +144,14 @@
                 android:id="@+id/moreButtton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/share"
+                android:src="@drawable/button_more"
                 android:layout_marginStart="16dp"
-                app:layout_constraintStart_toEndOf="@id/shareButtton"
+                app:layout_constraintStart_toEndOf="@id/shareButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <View
         android:id="@+id/overlay"
@@ -167,6 +167,34 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bottom_sheet_bg"
         android:elevation="505dp"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="266dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <View
+            android:layout_width="50dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bootomsheet_handle" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tracks_recycler_bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="@dimen/small_icon_pad" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="383dp"
+        android:orientation="vertical"
+        android:background="@drawable/bottom_sheet_bg"
+        android:padding="16dp"
+        android:elevation="505dp"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -179,32 +207,52 @@
             android:layout_marginBottom="12dp"
             android:background="@drawable/bootomsheet_handle" />
 
-        <TextView
-            android:id="@+id/bottom_sheet_title"
+        <FrameLayout
+            android:id="@+id/playlist_info_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/add_toplaylist"
-            android:textColor="@color/black"
-            android:padding="@dimen/us_padSt"
-            android:textSize="@dimen/text19sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:layout_marginTop="12dp" />
 
-        <Button
-            android:id="@+id/create_playlist_button"
-            style="@style/SearchClearButtonStyle"
-            android:padding="@dimen/us_padSt"
-            android:text="@string/new_playlist"
-            android:layout_marginHorizontal="@dimen/us_padSt"
-            android:layout_marginBottom="@dimen/small_icon_pad"
-            android:textStyle="bold" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/playlists_recycler_bottom_sheet"
+        <TextView
+            android:id="@+id/menu_share"
+            style="@style/BottomSheetText"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="@dimen/small_icon_pad" />
+            android:layout_height="wrap_content"
+            android:text="Поделиться"
+            android:drawablePadding="8dp"
+            android:paddingVertical="12dp"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+
+        <TextView
+            android:id="@+id/menu_edit"
+            style="@style/BottomSheetText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Редактировать информацию"
+            android:drawablePadding="8dp"
+            android:paddingVertical="12dp"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+
+        <TextView
+            android:id="@+id/menu_delete"
+            style="@style/BottomSheetText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Удалить плейлист"
+            android:drawablePadding="8dp"
+            android:paddingVertical="12dp"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+
     </LinearLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

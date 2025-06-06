@@ -2,7 +2,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("org.jetbrains.kotlin.kapt")
+    id("kotlin-parcelize")
 }
+
 
 android {
     namespace = "com.practicum.playlistmaker"
@@ -78,6 +80,5 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     kapt(libs.glide.compiler)
     implementation(libs.androidx.appcompat)
-
 
 }

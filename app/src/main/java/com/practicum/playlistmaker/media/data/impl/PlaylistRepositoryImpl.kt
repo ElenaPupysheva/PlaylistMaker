@@ -7,6 +7,7 @@ import com.practicum.playlistmaker.media.data.converters.toPlaylistTrackEntity
 import com.practicum.playlistmaker.media.data.db.PlaylistDao
 import com.practicum.playlistmaker.media.data.db.PlaylistEntity
 import com.practicum.playlistmaker.media.data.db.PlaylistTrackDao
+import com.practicum.playlistmaker.media.data.db.PlaylistTrackEntity
 import com.practicum.playlistmaker.media.domain.PlaylistRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -44,7 +45,10 @@ class PlaylistRepositoryImpl(
             entities.map { it.toDomain() }
         }
     }
-
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        playlistDao.deletePlaylist(playlist.toEntity())
+        cleanupUnusedTracks()
+    }
 
     private fun Playlist.toEntity(): PlaylistEntity {
         return PlaylistEntity(
@@ -67,4 +71,53 @@ class PlaylistRepositoryImpl(
             trackCount = trackCount
         )
     }
+    override suspend fun getTracksForPlaylist(playlist: Playlist): List<Track> {
+        return getTracksByIds(playlist.trackIds)
+    }
+
+    override suspend fun removeTrackFromPlaylist(playlist: Playlist, track: Track) {
+        val updatedTrackIds: MutableList<Long> = playlist.trackIds.toMutableList()
+        updatedTrackIds.removeIf { it == track.trackId.toLong() }
+
+        val updatedPlaylist = playlist.copy(
+            trackIds = updatedTrackIds,
+            trackCount = updatedTrackIds.size
+        )
+
+        playlistDao.updatePlaylist(updatedPlaylist.toEntity())
+    }
+
+    override suspend fun getTracksByIds(trackIds: List<Long>): List<Track> {
+        val allTracks = playlistTrackDao.getAllTracks()
+        return allTracks
+            .filter { it.trackId.toLong() in trackIds }
+            .map { playlistConvertor.mapToTrack(it) }
+    }
+
+    override suspend fun deleteTrackIfOrphaned(track: Track) {
+        val allPlaylists = playlistDao.getAllPlaylists()
+        val isTrackUsed = allPlaylists.any { entity ->
+            val trackIds = playlistConvertor.toList(entity.trackIdsJson)
+            track.trackId.toLong() in trackIds
+        }
+        if (!isTrackUsed) {
+            playlistTrackDao.deleteTrackById(track.trackId)
+        }
+    }
+
+    private suspend fun cleanupUnusedTracks() {
+        val allPlaylists = playlistDao.getAllPlaylists()
+        val usedTrackIds = allPlaylists
+            .flatMap { playlistConvertor.toList(it.trackIdsJson) }
+            .toSet()
+        val allTracks = playlistTrackDao.getAllTracks()
+
+        allTracks.forEach { trackEntity: PlaylistTrackEntity ->
+            if (trackEntity.trackId.toLong() !in usedTrackIds) {
+                playlistTrackDao.deleteTrackById(trackEntity.trackId)
+            }
+        }
+    }
+
+
 }
