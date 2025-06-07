@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.media.domain.PlaylistInteractor
@@ -33,8 +34,6 @@ class PlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.playlistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-        adapter = PlaylistsAdapter(emptyList())
-        binding.playlistsRecyclerView.adapter = adapter
 
         binding.newPlaylist.setOnClickListener {
             findNavController().navigate(com.practicum.playlistmaker.R.id.newPlaylistFragment)
@@ -57,7 +56,13 @@ class PlaylistFragment : Fragment() {
             } else {
                 binding.placeholder.visibility = View.GONE
                 binding.playlistsRecyclerView.visibility = View.VISIBLE
-                adapter = PlaylistsAdapter(playlists)
+
+                adapter = PlaylistsAdapter(playlists) { playlistId ->
+                    val bundle = Bundle().apply {
+                        putLong("playlistId", playlistId)
+                    }
+                    findNavController().navigate(R.id.detailedFragment, bundle)
+                }
                 binding.playlistsRecyclerView.adapter = adapter
             }
         }

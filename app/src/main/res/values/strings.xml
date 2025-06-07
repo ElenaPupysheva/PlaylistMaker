@@ -43,4 +43,9 @@
     <string name="areDone">Завершить создание плейлиста?</string>
     <string name="lostData">Все несохраненные данные будут потеряны</string>
     <string name="finish">Завершить</string>
+
+    <string name="menu_edit">Редактировать</string>
+    <string name="save">Сохранить</string>
+
+
 </resources>

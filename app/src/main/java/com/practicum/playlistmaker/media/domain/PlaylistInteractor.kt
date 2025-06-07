@@ -4,27 +4,17 @@ import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 
-class PlaylistInteractor(private val repository: PlaylistRepository) {
+interface PlaylistInteractor {
+    suspend fun savePlaylist(playlist: Playlist)
+    suspend fun updatePlaylist(playlist: Playlist)
+    suspend fun getAllPlaylists(): List<Playlist>
+    suspend fun getPlaylistById(id: Long): Playlist?
+    suspend fun saveTrackToPlaylistTracks(track: Track)
+    fun getPlaylists(): Flow<List<Playlist>>
+    suspend fun getTracksForPlaylist(playlist: Playlist): List<Track>
+    suspend fun getTracksByIds(ids: List<Long>): List<Track>
+    suspend fun removeTrackFromPlaylist(playlist: Playlist, track: Track)
+    suspend fun deleteTrackIfOrphaned(track: Track)
+    suspend fun deletePlaylist(playlist: Playlist)
 
-    suspend fun savePlaylist(playlist: Playlist) {
-        repository.addPlaylist(playlist)
-    }
-
-    suspend fun updatePlaylist(playlist: Playlist) {
-        repository.updatePlaylist(playlist)
-    }
-
-    suspend fun getAllPlaylists(): List<Playlist> {
-        return repository.getPlaylists()
-    }
-
-
-    suspend fun saveTrackToPlaylistTracks(track: Track) {
-        repository.saveTrackToPlaylistTracks(track)
-    }
-
-    fun getPlaylists(): Flow<List<Playlist>> {
-        return repository.getPlaylistsFlow()
-    }
 }
-

@@ -2,7 +2,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("org.jetbrains.kotlin.kapt")
+    id("kotlin-parcelize")
 }
+
 
 android {
     namespace = "com.practicum.playlistmaker"
@@ -38,6 +40,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 dependencies {
@@ -55,7 +58,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.glide)
-    annotationProcessor(libs.glide.compiler)
     implementation(libs.gson)
     implementation(libs.retrofit)
     implementation(libs.converter)
@@ -68,6 +70,5 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     kapt(libs.glide.compiler)
     implementation(libs.androidx.appcompat)
-
 
 }

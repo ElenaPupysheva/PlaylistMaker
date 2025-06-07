@@ -15,7 +15,6 @@ retrofit = "2.9.0"
 converter-gson = "2.9.0"
 lifecycleViewModelKtx = "2.6.1"
 lifecycleRuntimeKtx = "2.6.1"
-
 koin-android = "3.3.0"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
