@@ -46,7 +46,9 @@ class DetailedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.toolbarPlayer.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
         val playlistId = arguments?.getLong("playlistId") ?: return
         viewModel.loadPlaylistById(playlistId)
 
