@@ -14,9 +14,9 @@
         <item name="colorSurface">#AEAFB4</item>
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
-
-
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
+
+
 </resources>

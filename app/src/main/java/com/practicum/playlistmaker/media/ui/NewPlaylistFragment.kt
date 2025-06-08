@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.media.ui
 
+import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -29,6 +30,7 @@ import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileOutputStream
 import android.graphics.ImageDecoder
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 
 class NewPlaylistFragment : Fragment() {
@@ -164,15 +166,22 @@ class NewPlaylistFragment : Fragment() {
 
     private fun handleExit() {
         if (isModified) {
-            MaterialAlertDialogBuilder(requireContext())
+            val dialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.areDone)
                 .setMessage(R.string.lostData)
                 .setNegativeButton(R.string.cancel, null)
                 .setPositiveButton(R.string.finish) { _, _ ->
                     requireActivity().supportFragmentManager.popBackStack()
-
                 }
-                .show()
+                .create()
+
+            dialog.setOnShowListener {
+                val blue = ContextCompat.getColor(requireContext(), R.color.blue_primary)
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(blue)
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(blue)
+            }
+
+            dialog.show()
         } else {
             requireActivity().supportFragmentManager.popBackStack()
         }
