@@ -88,9 +88,11 @@ class NewPlaylistFragment : Fragment() {
         binding.editNameField.doOnTextChanged { text, _, _, _ ->
             binding.createButton.isEnabled = !text.isNullOrBlank()
             isModified = true
+            updateCreateButtonState()
         }
         binding.editDescriptionField.doOnTextChanged { _, _, _, _ ->
             isModified = true
+            updateCreateButtonState()
         }
         binding.imageFrame.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -138,9 +140,26 @@ class NewPlaylistFragment : Fragment() {
                     ).show()
                 }
                 isModified = false
-                findNavController().navigateUp()
+                requireActivity().supportFragmentManager.popBackStack()
+
             }
         }
+        updateCreateButtonState()
+    }
+
+    private fun updateCreateButtonState() {
+        val name = binding.editNameField.text.toString()
+        val description = binding.editDescriptionField.text.toString()
+
+        val nameNotBlank = name.isNotBlank()
+        val isEditMode = editingPlaylist != null
+        val hasChanges = if (isEditMode) {
+            name != editingPlaylist?.name || description != editingPlaylist?.description || savedImagePath != editingPlaylist?.imagePath
+        } else {
+            nameNotBlank
+        }
+
+        binding.createButton.isEnabled = nameNotBlank && hasChanges
     }
 
     private fun handleExit() {
@@ -150,11 +169,12 @@ class NewPlaylistFragment : Fragment() {
                 .setMessage(R.string.lostData)
                 .setNegativeButton(R.string.cancel, null)
                 .setPositiveButton(R.string.finish) { _, _ ->
-                    findNavController().navigateUp()
+                    requireActivity().supportFragmentManager.popBackStack()
+
                 }
                 .show()
         } else {
-            findNavController().navigateUp()
+            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 

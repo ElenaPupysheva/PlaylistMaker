@@ -39,8 +39,8 @@
         android:id="@+id/playlistsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
-        android:clipToPadding="false"
         android:layout_marginTop="76dp"
-        android:layout_gravity="center_horizontal" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:clipToPadding="false" />
 </FrameLayout>
