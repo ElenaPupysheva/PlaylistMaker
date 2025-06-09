@@ -53,5 +53,5 @@
         android:layout_marginTop="@dimen/main_padSt"
         android:layout_marginStart="@dimen/main_padSt"
         android:layout_marginEnd="@dimen/main_padSt"
-        android:paddingBottom="@dimen/size_52dp" />
+        android:paddingBottom="64dp" />
 </LinearLayout>
