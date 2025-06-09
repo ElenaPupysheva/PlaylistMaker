@@ -7,7 +7,11 @@
     android:layout_width="160dp"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    android:layout_marginBottom="16dp">
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="@android:color/transparent"
+    android:background="@android:color/transparent"
+
+    app:cardUseCompatPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="160dp"
