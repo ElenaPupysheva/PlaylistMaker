@@ -1,21 +1,26 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
     tools:context=".media.ui.PlaylistFragment">
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/newPlaylist"
         style="@style/SearchClearButtonStyle"
         android:text="@string/new_playlist"
+
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="24dp" />
+        android:layout_marginTop="@dimen/top_mar" />
 
     <LinearLayout
         android:id="@+id/placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_weight="1"
         android:layout_gravity="center_horizontal"
         android:visibility="gone">
 
@@ -31,7 +36,7 @@
             android:id="@+id/placeholderText"
             style="@style/mediaClean"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/us_padSt"
             android:text="@string/media_playlist" />
     </LinearLayout>
 
@@ -39,8 +44,14 @@
         android:id="@+id/playlistsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         android:clipToPadding="false"
-        android:layout_marginTop="76dp"
-        android:layout_gravity="center_horizontal" />
-</FrameLayout>
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"
+        tools:itemCount="6"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/main_padSt"
+        android:layout_marginStart="@dimen/main_padSt"
+        android:layout_marginEnd="@dimen/main_padSt"
+        android:paddingBottom="64dp" />
+</LinearLayout>

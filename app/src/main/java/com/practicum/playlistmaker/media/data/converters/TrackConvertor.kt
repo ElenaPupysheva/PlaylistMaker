@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.media.data.converters
 
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.media.data.db.FavoriteEntity
+import com.practicum.playlistmaker.media.data.db.PlaylistTrackEntity
 
 class TrackConvertor {
 
@@ -31,4 +32,5 @@ class TrackConvertor {
         entity.country,
         entity.previewUrl
     )
+
 }
