@@ -96,6 +96,13 @@
             app:layout_constraintTop_toBottomOf="@id/playerGroupName"
             app:srcCompat="@drawable/play_button" />
 
+        <com.practicum.playlistmaker.player.ui.custom.PlaybackButtonView
+            android:layout_width="wrap_content"
+            android:layout_height="84dp"
+            app:layout_constraintEnd_toEndOf="@id/Start_guideline"
+            app:layout_constraintStart_toStartOf="@id/End_guideline"
+            app:layout_constraintTop_toBottomOf="@id/playerGroupName" />
+
         <ImageButton
             android:id="@+id/addButton"
             android:layout_width="51dp"
