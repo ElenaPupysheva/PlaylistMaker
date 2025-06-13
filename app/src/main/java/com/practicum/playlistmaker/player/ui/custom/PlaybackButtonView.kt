@@ -21,6 +21,7 @@ class PlaybackButtonView @JvmOverloads constructor(
 
     private var playIcon: Bitmap? = null
     private var pauseIcon: Bitmap? = null
+    private var imageRect = RectF(0f, 0f, 0f, 0f)
 
     var isPlaying: Boolean = false
         set(value) {
@@ -67,12 +68,15 @@ class PlaybackButtonView @JvmOverloads constructor(
         this.clickListener = listener
     }
 
-    override fun onDraw(canvas: Canvas) {
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        imageRect = RectF(0f, 0f, measuredWidth.toFloat(), measuredHeight.toFloat())
+    }
 
+    override fun onDraw(canvas: Canvas) {
         val iconToDraw = if (isPlaying) pauseIcon else playIcon
         iconToDraw?.let {
-            val rect = RectF(0f, 0f, width.toFloat(), height.toFloat())
-            canvas.drawBitmap(it, null, rect, null)
+            canvas.drawBitmap(it, null, imageRect, null)
         }
     }
 }
