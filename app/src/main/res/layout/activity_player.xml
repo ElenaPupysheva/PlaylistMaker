@@ -85,7 +85,8 @@
             app:layout_constraintEnd_toStartOf="@id/Start_guideline"
             app:layout_constraintTop_toBottomOf="@+id/musicTrackName" />
 
-        <ImageButton
+
+        <com.practicum.playlistmaker.player.ui.custom.PlaybackButtonView
             android:id="@+id/playButton"
             android:layout_width="84dp"
             android:layout_height="84dp"
@@ -94,7 +95,8 @@
             app:layout_constraintEnd_toEndOf="@id/Start_guideline"
             app:layout_constraintStart_toStartOf="@id/End_guideline"
             app:layout_constraintTop_toBottomOf="@id/playerGroupName"
-            app:srcCompat="@drawable/play_button" />
+            app:playIcon="@drawable/play_button"
+            app:pauseIcon="@drawable/pause_button" />
 
         <ImageButton
             android:id="@+id/addButton"

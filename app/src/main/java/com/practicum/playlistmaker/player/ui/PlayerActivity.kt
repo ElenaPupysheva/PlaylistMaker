@@ -75,7 +75,7 @@ class PlayerActivity : AppCompatActivity() {
             }
             .launchIn(lifecycleScope)
 
-        binding.playButton.setOnClickListener {
+        binding.playButton.setOnPlaybackClickListener {
             viewModel.playbackControl()
         }
 
@@ -132,22 +132,22 @@ class PlayerActivity : AppCompatActivity() {
             when (uiState.playerState) {
                 is PlayerState.Prepared -> {
                     binding.playButton.isEnabled = true
-                    binding.playButton.setImageResource(R.drawable.play_button)
+                    binding.playButton.isPlaying = false
                 }
 
                 is PlayerState.Playing -> {
                     binding.playButton.isEnabled = true
-                    binding.playButton.setImageResource(R.drawable.pause_button)
+                    binding.playButton.isPlaying = true
                 }
 
                 is PlayerState.Paused -> {
                     binding.playButton.isEnabled = true
-                    binding.playButton.setImageResource(R.drawable.play_button)
+                    binding.playButton.isPlaying = false
                 }
 
                 is PlayerState.Default -> {
                     binding.playButton.isEnabled = false
-                    binding.playButton.setImageResource(R.drawable.play_button)
+                    binding.playButton.isPlaying = false
                 }
             }
 

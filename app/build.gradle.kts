@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("org.jetbrains.kotlin.kapt")
     id("kotlin-parcelize")
+
 }
 
 
@@ -70,5 +71,6 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     kapt(libs.glide.compiler)
     implementation(libs.androidx.appcompat)
+    implementation("androidx.core:core-ktx:1.7.0")
 
 }
