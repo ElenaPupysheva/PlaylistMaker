@@ -1,12 +1,15 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.os.IBinder
 import android.view.View
 import android.widget.LinearLayout
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +24,7 @@ import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.media.domain.PlaylistInteractor
 import com.practicum.playlistmaker.media.ui.NewPlaylistFragment
 import com.practicum.playlistmaker.player.data.dto.PlayerState
+import com.practicum.playlistmaker.player.data.service.MusicService
 import com.practicum.playlistmaker.player.presentation.PlayerUiState
 import com.practicum.playlistmaker.player.presentation.PlayerViewModel
 import org.koin.android.ext.android.inject
@@ -37,24 +41,26 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var currentTrack: Track
 
+    private var musicService: MusicService? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val serviceIntent = Intent(this, MusicService::class.java)
+        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
 
         setupUI()
         observeViewModel()
 
         val jsonTrack = intent.getStringExtra(EXTRA_TRACK) ?: return finish()
         currentTrack = Gson().fromJson(jsonTrack, Track::class.java) ?: return finish()
-        val url = currentTrack.previewUrl ?: return finish()
 
-        viewModel.observeFavorite(currentTrack.trackId)
-        viewModel.preparePlayer(url)
-        bindTrackInfo(currentTrack)
         bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
+
         viewModel.playlists
             .onEach { playlists ->
 
@@ -111,6 +117,13 @@ class PlayerActivity : AppCompatActivity() {
                 binding.newPlaylistContainer.visibility = View.GONE
             }
         }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(serviceConnection)
+        musicService?.pausePlayer()
 
     }
 
@@ -184,4 +197,42 @@ class PlayerActivity : AppCompatActivity() {
         super.onPause()
         viewModel.pausePlayer()
     }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicService.MusicServiceBinder
+            musicService = binder.getService()
+
+            musicService?.setPlayerStateListener(object : MusicService.PlayerStateListener {
+                override fun onStateChanged(state: PlayerState) {
+                    runOnUiThread {
+                        viewModel.updatePlayerStateFromService(state)
+                    }
+                }
+            })
+            viewModel.attachService(musicService!!)
+
+            viewModel.observeFavorite(currentTrack.trackId)
+            currentTrack.previewUrl?.let { viewModel.preparePlayer(it) }
+            bindTrackInfo(currentTrack)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            musicService = null
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        musicService?.hideNotification()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        val track = currentTrack
+        if (musicService?.isPlaying() == true) {
+            musicService?.showNotification(track.trackName, track.artistName)
+        }
+    }
+
 }
