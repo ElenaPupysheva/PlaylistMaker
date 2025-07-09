@@ -63,8 +63,15 @@ class PlayerViewModel(
 
     fun playbackControl() {
         when (_uiState.value?.playerState) {
-            is PlayerState.Playing -> musicService?.pausePlayer()
-            is PlayerState.Paused, is PlayerState.Prepared -> musicService?.startPlayer()
+            is PlayerState.Playing -> {
+                musicService?.pausePlayer()
+                _uiState.postValue(_uiState.value?.copy(playerState = PlayerState.Paused()))
+            }
+
+            is PlayerState.Paused, is PlayerState.Prepared -> {
+                musicService?.startPlayer()
+                _uiState.postValue(_uiState.value?.copy(playerState = PlayerState.Playing()))
+            }
             else -> {}
         }
     }
