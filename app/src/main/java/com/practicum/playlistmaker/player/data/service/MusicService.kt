@@ -40,14 +40,6 @@ internal class MusicService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Playback",
-                NotificationManager.IMPORTANCE_LOW
-            )
-            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
-        }
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Playlist Maker")
@@ -74,11 +66,6 @@ internal class MusicService : Service() {
     }
 
     fun showNotification(title: String, artist: String) {
-        val channel =
-            NotificationChannel(CHANNEL_ID, "Playback", NotificationManager.IMPORTANCE_LOW)
-        getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
-
-
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Playlist Maker")
             .setContentText("$artist - $title")
@@ -95,7 +82,7 @@ internal class MusicService : Service() {
     }
 
     fun hideNotification() {
-        stopForeground(false)
+        stopForeground(true)
     }
 
     fun preparePlayer(url: String) {
@@ -107,7 +94,7 @@ internal class MusicService : Service() {
                 playerStateListener?.onStateChanged(playerState)
             }
             setOnCompletionListener {
-                playerState = PlayerState.Prepared()
+                playerState = PlayerState.Default()
                 playerStateListener?.onStateChanged(playerState)
                 stopPlayerAndService()
             }

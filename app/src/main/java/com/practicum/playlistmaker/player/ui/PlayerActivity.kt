@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import androidx.appcompat.app.AppCompatActivity
@@ -41,15 +43,23 @@ class PlayerActivity : AppCompatActivity() {
     private var musicService: MusicService? = null
     private var isFinishingByUser = false
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            startMusicService()
+        } else {
+            Toast.makeText(this, "Разрешение на уведомления не получено", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val serviceIntent = Intent(this, MusicService::class.java)
-        startService(serviceIntent)
-        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
-
+        checkNotificationPermissionAndStartService()
         setupUI()
         observeViewModel()
 
@@ -120,7 +130,39 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
+    private fun checkNotificationPermissionAndStartService() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            when {
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED -> {
+                    startMusicService()
+                }
 
+                shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS) -> {
+                    Toast.makeText(
+                        this,
+                        "Разрешение на уведомления нужно для отображения состояния плеера",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+
+                else -> {
+                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        } else {
+            startMusicService()
+        }
+    }
+
+    private fun startMusicService() {
+        val serviceIntent = Intent(this, MusicService::class.java)
+        startService(serviceIntent)
+        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
+    }
 
     private fun openNewPlaylistFragment() {
         supportFragmentManager.beginTransaction()
@@ -226,11 +268,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        if (musicService != null && musicService?.isPlaying() == false) {
-            stopService(Intent(this, MusicService::class.java))
-        }
-
+        musicService?.pausePlayer()
         unbindService(serviceConnection)
         musicService = null
     }
