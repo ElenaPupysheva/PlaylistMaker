@@ -14,6 +14,7 @@ import com.practicum.playlistmaker.player.data.dto.PlayerState
 import android.app.NotificationManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
 import android.os.Build
+import android.util.Log
 
 internal class MusicService : Service() {
     private val binder = MusicServiceBinder()
@@ -38,6 +39,32 @@ internal class MusicService : Service() {
         }
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Playback",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Playlist Maker")
+            .setContentText("Подготовка к воспроизведению")
+            .setSmallIcon(R.drawable.play_button)
+            .build()
+
+        ServiceCompat.startForeground(
+            this,
+            NOTIFICATION_ID,
+            notification,
+            FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+        )
+
+        return START_NOT_STICKY
+    }
+
     inner class MusicServiceBinder : Binder() {
         fun getService(): MusicService = this@MusicService
     }
@@ -53,8 +80,8 @@ internal class MusicService : Service() {
 
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(artist)
+            .setContentTitle("Playlist Maker")
+            .setContentText("$artist - $title")
             .setSmallIcon(R.drawable.play_button)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
@@ -82,7 +109,7 @@ internal class MusicService : Service() {
             setOnCompletionListener {
                 playerState = PlayerState.Prepared()
                 playerStateListener?.onStateChanged(playerState)
-                stopForeground(true)
+                stopPlayerAndService()
             }
             prepareAsync()
         }
@@ -108,6 +135,18 @@ internal class MusicService : Service() {
         playerStateListener?.onStateChanged(playerState)
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        stopPlayerAndService()
+    }
+
+    private fun stopPlayerAndService() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        stopForeground(true)
+        stopSelf()
+    }
     interface PlayerStateListener {
         fun onStateChanged(state: PlayerState)
     }

@@ -35,13 +35,11 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private val viewModel: PlayerViewModel by viewModel()
     private val playlistInteractor: PlaylistInteractor by inject()
-
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var bottomSheetAdapter: BottomSheetPlaylistsAdapter
-
     private lateinit var currentTrack: Track
-
     private var musicService: MusicService? = null
+    private var isFinishingByUser = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +47,7 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val serviceIntent = Intent(this, MusicService::class.java)
+        startService(serviceIntent)
         bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
 
         setupUI()
@@ -86,7 +85,8 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         binding.toolbarPlayer.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            isFinishingByUser = true
+            finish()
         }
 
         binding.favoritesBtn.setOnClickListener { viewModel.onLikeClicked(currentTrack) }
@@ -120,12 +120,6 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unbindService(serviceConnection)
-        musicService?.pausePlayer()
-
-    }
 
 
     private fun openNewPlaylistFragment() {
@@ -193,15 +187,12 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.pausePlayer()
-    }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as MusicService.MusicServiceBinder
             musicService = binder.getService()
+            musicService?.hideNotification()
 
             musicService?.setPlayerStateListener(object : MusicService.PlayerStateListener {
                 override fun onStateChanged(state: PlayerState) {
@@ -224,14 +215,34 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        musicService?.hideNotification()
+        if (musicService?.isPlaying() == true) {
+            musicService?.hideNotification()
+        }
     }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (musicService != null && musicService?.isPlaying() == false) {
+            stopService(Intent(this, MusicService::class.java))
+        }
+
+        unbindService(serviceConnection)
+        musicService = null
+    }
+
 
     override fun onStop() {
         super.onStop()
-        val track = currentTrack
-        if (musicService?.isPlaying() == true) {
-            musicService?.showNotification(track.trackName, track.artistName)
+        if (isFinishingByUser) {
+            musicService?.pausePlayer()
+            stopService(Intent(this, MusicService::class.java))
+        } else if (musicService?.isPlaying() == true) {
+            musicService?.showNotification(currentTrack.trackName, currentTrack.artistName)
         }
     }
 
