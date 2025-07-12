@@ -5,4 +5,5 @@ sealed class PlayerState {
     class Prepared : PlayerState()
     class Playing : PlayerState()
     class Paused : PlayerState()
+    class Complete : PlayerState()
 }

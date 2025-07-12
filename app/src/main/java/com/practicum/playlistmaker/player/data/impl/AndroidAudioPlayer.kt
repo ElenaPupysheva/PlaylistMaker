@@ -1,27 +1,20 @@
 package com.practicum.playlistmaker.player.data.impl
 
 import android.media.MediaPlayer
+import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.domain.api.AudioRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class AndroidAudioPlayer(private val mediaPlayer: MediaPlayer) : AudioRepository {
-    private var onPreparedCallback: (() -> Unit)? = null
-    private var onCompletionCallback: (() -> Unit)? = null
+    private val _playerStateFlow = MutableStateFlow<PlayerState>(PlayerState.Default())
+    override val playerStateFlow: StateFlow<PlayerState> = _playerStateFlow
 
-    override fun preparePlayer(
-        url: String,
-        onPrepared: () -> Unit,
-        onCompletion: () -> Unit
-    ) {
+    override fun preparePlayer(url: String) {
         releasePlayer()
-        onPreparedCallback = onPrepared
-        onCompletionCallback = onCompletion
-
         mediaPlayer.apply {
-            releasePlayer()
             setDataSource(url)
             prepareAsync()
-            setOnPreparedListener { onPreparedCallback?.invoke() }
-            setOnCompletionListener { onCompletionCallback?.invoke() }
         }
     }
 

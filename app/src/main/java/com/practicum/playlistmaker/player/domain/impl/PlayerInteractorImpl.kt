@@ -1,18 +1,18 @@
 package com.practicum.playlistmaker.player.domain.impl
 
+import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.domain.api.AudioRepository
 import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
+import kotlinx.coroutines.flow.StateFlow
 
 class PlayerInteractorImpl(
     private val audioPlayer: AudioRepository
 ) : PlayerInteractor {
 
-    override fun preparePlayer(
-        url: String,
-        onPrepared: () -> Unit,
-        onCompletion: () -> Unit
-    ) {
-        audioPlayer.preparePlayer(url, onPrepared, onCompletion)
+    override val playerStateFlow: StateFlow<PlayerState> = audioPlayer.playerStateFlow
+
+    override fun preparePlayer(url: String) {
+        audioPlayer.preparePlayer(url)
     }
 
     override fun startPlayer() {

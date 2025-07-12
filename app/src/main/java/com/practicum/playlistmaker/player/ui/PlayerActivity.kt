@@ -53,7 +53,6 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
@@ -62,6 +61,7 @@ class PlayerActivity : AppCompatActivity() {
         checkNotificationPermissionAndStartService()
         setupUI()
         observeViewModel()
+        bindTrackInfo(currentTrack)
 
         val jsonTrack = intent.getStringExtra(EXTRA_TRACK) ?: return finish()
         currentTrack = Gson().fromJson(jsonTrack, Track::class.java) ?: return finish()
@@ -127,7 +127,6 @@ class PlayerActivity : AppCompatActivity() {
                 binding.newPlaylistContainer.visibility = View.GONE
             }
         }
-
     }
 
     private fun checkNotificationPermissionAndStartService() {
@@ -159,9 +158,29 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun startMusicService() {
-        val serviceIntent = Intent(this, MusicService::class.java)
+        val serviceIntent = Intent(this, MusicService::class.java).apply {
+            putExtra(MusicService.EXTRA_TRACK_URL, currentTrack.previewUrl)
+            putExtra(MusicService.EXTRA_TRACK_NAME, currentTrack.trackName)
+            putExtra(MusicService.EXTRA_ARTIST_NAME, currentTrack.artistName)
+        }
+
         startService(serviceIntent)
         bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicService.MusicServiceBinder
+            musicService = binder.getService()
+            musicService?.hideNotification()
+
+            viewModel.observeFavorite(currentTrack.trackId)
+
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            musicService = null
+        }
     }
 
     private fun openNewPlaylistFragment() {
@@ -198,6 +217,11 @@ class PlayerActivity : AppCompatActivity() {
                     binding.playButton.isEnabled = false
                     binding.playButton.isPlaying = false
                 }
+                is PlayerState.Complete -> {
+                    binding.playButton.isEnabled = false
+                    binding.playButton.isPlaying = false
+                    binding.musicTimeDuration.text = "00:00"
+                }
             }
 
             binding.musicTimeDuration.text = uiState.currentTime
@@ -227,33 +251,11 @@ class PlayerActivity : AppCompatActivity() {
                 .transform(RoundedCorners(16))
                 .into(musicTrackCover)
         }
+
     }
 
 
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as MusicService.MusicServiceBinder
-            musicService = binder.getService()
-            musicService?.hideNotification()
 
-            musicService?.setPlayerStateListener(object : MusicService.PlayerStateListener {
-                override fun onStateChanged(state: PlayerState) {
-                    runOnUiThread {
-                        viewModel.updatePlayerStateFromService(state)
-                    }
-                }
-            })
-            viewModel.attachService(musicService!!)
-
-            viewModel.observeFavorite(currentTrack.trackId)
-            currentTrack.previewUrl?.let { viewModel.preparePlayer(it) }
-            bindTrackInfo(currentTrack)
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            musicService = null
-        }
-    }
 
     override fun onStart() {
         super.onStart()
@@ -262,9 +264,6 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
 
     override fun onDestroy() {
         super.onDestroy()

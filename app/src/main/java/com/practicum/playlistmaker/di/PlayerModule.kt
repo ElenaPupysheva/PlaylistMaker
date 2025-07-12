@@ -17,6 +17,6 @@ val playerModule = module {
     single<PlayerInteractor> { PlayerInteractorImpl(get()) }
 
     viewModel<PlayerViewModel> {
-        PlayerViewModel(get(), get())
+        PlayerViewModel(get(), get(), get())
     }
 }
