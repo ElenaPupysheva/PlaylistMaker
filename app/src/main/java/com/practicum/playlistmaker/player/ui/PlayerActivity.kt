@@ -10,8 +10,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.launchIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,21 +25,28 @@ import com.practicum.playlistmaker.media.domain.PlaylistInteractor
 import com.practicum.playlistmaker.media.ui.NewPlaylistFragment
 import com.practicum.playlistmaker.player.data.dto.PlayerState
 import com.practicum.playlistmaker.player.data.service.MusicService
+import com.practicum.playlistmaker.player.domain.api.AudioRepository
+import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
+import com.practicum.playlistmaker.player.domain.impl.AudioRepositoryImpl
+import com.practicum.playlistmaker.player.domain.impl.PlayerInteractorImpl
 import com.practicum.playlistmaker.player.presentation.PlayerUiState
 import com.practicum.playlistmaker.player.presentation.PlayerViewModel
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import org.koin.android.ext.android.get
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
-    private val viewModel: PlayerViewModel by viewModel()
-    private val playlistInteractor: PlaylistInteractor by inject()
+    private lateinit var viewModel: PlayerViewModel
+    private val playlistInteractor: PlaylistInteractor by lazy { get() }
+
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var bottomSheetAdapter: BottomSheetPlaylistsAdapter
     private lateinit var currentTrack: Track
     private var musicService: MusicService? = null
     private var isFinishingByUser = false
+    private var wasPreparedInActivity = false
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -58,48 +63,21 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        checkNotificationPermissionAndStartService()
-        setupUI()
-        observeViewModel()
-        bindTrackInfo(currentTrack)
-
         val jsonTrack = intent.getStringExtra(EXTRA_TRACK) ?: return finish()
         currentTrack = Gson().fromJson(jsonTrack, Track::class.java) ?: return finish()
 
+        checkNotificationPermissionAndStartService()
+        setupUI()
+        bindTrackInfo(currentTrack)
+
         bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
-        }
-
-        viewModel.playlists
-            .onEach { playlists ->
-
-                println("DEBUG: Получено плейлистов: ${playlists.size}")
-                playlists.forEach {
-                    println("DEBUG: Плейлист: ${it.name}, ID: ${it.id}, треков: ${it.trackCount}")
-                }
-
-                bottomSheetAdapter = BottomSheetPlaylistsAdapter(
-                    playlists = playlists,
-                    currentTrack = currentTrack,
-                    playlistInteractor = playlistInteractor,
-                    bottomSheetBehavior = bottomSheetBehavior
-                )
-                binding.playlistsRecyclerBottomSheet.adapter = bottomSheetAdapter
-                binding.playlistsRecyclerBottomSheet.layoutManager =
-                    LinearLayoutManager(this@PlayerActivity)
-            }
-            .launchIn(lifecycleScope)
-
-        binding.playButton.setOnPlaybackClickListener {
-            viewModel.playbackControl()
         }
 
         binding.toolbarPlayer.setNavigationOnClickListener {
             isFinishingByUser = true
             finish()
         }
-
-        binding.favoritesBtn.setOnClickListener { viewModel.onLikeClicked(currentTrack) }
 
         binding.addButton.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -118,7 +96,7 @@ class PlayerActivity : AppCompatActivity() {
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.overlay.alpha = (0.0f).coerceAtLeast(slideOffset.coerceAtMost(1.0f))
+                binding.overlay.alpha = slideOffset.coerceIn(0.0f, 1.0f)
             }
         })
 
@@ -170,12 +148,49 @@ class PlayerActivity : AppCompatActivity() {
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as MusicService.MusicServiceBinder
+            val binder = service as? MusicService.MusicServiceBinder ?: return
             musicService = binder.getService()
             musicService?.hideNotification()
 
+            // Создание ViewModel вручную
+            val audioRepository: AudioRepository = AudioRepositoryImpl(musicService!!)
+            val playerInteractor: PlayerInteractor = PlayerInteractorImpl(audioRepository)
+
+            viewModel = PlayerViewModel(
+                playerInteractor = playerInteractor,
+                favoritesInteractor = get(),
+                playlistInteractor = get()
+            )
+
+            observeViewModel()
             viewModel.observeFavorite(currentTrack.trackId)
 
+            if (!wasPreparedInActivity) {
+                currentTrack.previewUrl?.let { viewModel.preparePlayer(it) }
+                wasPreparedInActivity = true
+            }
+
+            binding.playButton.setOnPlaybackClickListener {
+                viewModel.playbackControl(currentTrack.previewUrl)
+            }
+
+            binding.favoritesBtn.setOnClickListener {
+                viewModel.onLikeClicked(currentTrack)
+            }
+
+            viewModel.playlists
+                .onEach { playlists ->
+                    bottomSheetAdapter = BottomSheetPlaylistsAdapter(
+                        playlists = playlists,
+                        currentTrack = currentTrack,
+                        playlistInteractor = playlistInteractor,
+                        bottomSheetBehavior = bottomSheetBehavior
+                    )
+                    binding.playlistsRecyclerBottomSheet.adapter = bottomSheetAdapter
+                    binding.playlistsRecyclerBottomSheet.layoutManager =
+                        LinearLayoutManager(this@PlayerActivity)
+                }
+                .launchIn(lifecycleScope)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -196,42 +211,45 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.uiState.observe(this) { uiState: PlayerUiState ->
-            when (uiState.playerState) {
-                is PlayerState.Prepared -> {
-                    binding.playButton.isEnabled = true
-                    binding.playButton.isPlaying = false
-                }
+        lifecycleScope.launchWhenStarted {
+            viewModel.uiState.collect { uiState ->
+                when (uiState.playerState) {
+                    is PlayerState.Prepared -> {
+                        binding.playButton.isEnabled = true
+                        binding.playButton.isPlaying = false
+                    }
 
-                is PlayerState.Playing -> {
-                    binding.playButton.isEnabled = true
-                    binding.playButton.isPlaying = true
-                }
+                    is PlayerState.Playing -> {
+                        binding.playButton.isEnabled = true
+                        binding.playButton.isPlaying = true
+                    }
 
-                is PlayerState.Paused -> {
-                    binding.playButton.isEnabled = true
-                    binding.playButton.isPlaying = false
-                }
+                    is PlayerState.Paused -> {
+                        binding.playButton.isEnabled = true
+                        binding.playButton.isPlaying = false
+                    }
 
-                is PlayerState.Default -> {
-                    binding.playButton.isEnabled = false
-                    binding.playButton.isPlaying = false
+                    is PlayerState.Default -> {
+                        binding.playButton.isEnabled = false
+                        binding.playButton.isPlaying = false
+                    }
+
+                    is PlayerState.Complete -> {
+                        binding.playButton.isEnabled = false
+                        binding.playButton.isPlaying = false
+                        binding.musicTimeDuration.text = "00:00"
+                    }
                 }
-                is PlayerState.Complete -> {
-                    binding.playButton.isEnabled = false
-                    binding.playButton.isPlaying = false
-                    binding.musicTimeDuration.text = "00:00"
-                }
+                binding.musicTimeDuration.text = uiState.currentTime
             }
-
-            binding.musicTimeDuration.text = uiState.currentTime
         }
-        viewModel.isFavorite.observe(this) { liked -> setFavoriteButton(liked) }
-    }
 
-    private fun setFavoriteButton(isFavorite: Boolean) {
-        val icon = if (isFavorite) R.drawable.like_button_enable else R.drawable.like_button
-        binding.favoritesBtn.setImageResource(icon)
+        lifecycleScope.launchWhenStarted {
+            viewModel.isFavorite.collect { liked ->
+                val icon = if (liked) R.drawable.like_button_enable else R.drawable.like_button
+                binding.favoritesBtn.setImageResource(icon)
+            }
+        }
     }
 
     private fun bindTrackInfo(track: Track) {
@@ -251,11 +269,7 @@ class PlayerActivity : AppCompatActivity() {
                 .transform(RoundedCorners(16))
                 .into(musicTrackCover)
         }
-
     }
-
-
-
 
     override fun onStart() {
         super.onStart()
@@ -264,14 +278,12 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         musicService?.pausePlayer()
         unbindService(serviceConnection)
         musicService = null
     }
-
 
     override fun onStop() {
         super.onStop()
@@ -282,5 +294,4 @@ class PlayerActivity : AppCompatActivity() {
             musicService?.showNotification(currentTrack.trackName, currentTrack.artistName)
         }
     }
-
 }

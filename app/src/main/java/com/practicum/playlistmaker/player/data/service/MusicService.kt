@@ -22,6 +22,7 @@ internal class MusicService : Service() {
     private val _playerStateFlow = MutableStateFlow<PlayerState>(PlayerState.Default())
     val playerStateFlow = _playerStateFlow.asStateFlow()
     private var mediaPlayer: MediaPlayer? = null
+    private var isPrepared = false
     private var trackName: String? = null
     private var artistName: String? = null
 
@@ -38,9 +39,6 @@ internal class MusicService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        intent?.getStringExtra(EXTRA_TRACK_URL)?.let { url ->
-            preparePlayer(url)
-        }
         trackName = intent?.getStringExtra(EXTRA_TRACK_NAME)
         artistName = intent?.getStringExtra(EXTRA_ARTIST_NAME)
         return binder
@@ -88,17 +86,22 @@ internal class MusicService : Service() {
     }
 
     fun preparePlayer(url: String) {
-        mediaPlayer?.release()
+        if (mediaPlayer != null || isPrepared) {
+            return
+        }
         mediaPlayer = MediaPlayer().apply {
             setDataSource(url)
             setOnPreparedListener {
                 _playerStateFlow.value = PlayerState.Prepared()
+                isPrepared = true
             }
             setOnCompletionListener {
                 seekTo(0)
                 _playerStateFlow.value = PlayerState.Complete()
+                isPrepared = false
                 stopPlayerAndService()
             }
+
             prepareAsync()
         }
     }
@@ -127,9 +130,12 @@ internal class MusicService : Service() {
     }
 
     fun stopPlayerAndService() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        mediaPlayer?.apply {
+            stop()
+            release()
+        }
         mediaPlayer = null
+        isPrepared = false
         stopForeground(true)
         stopSelf()
     }

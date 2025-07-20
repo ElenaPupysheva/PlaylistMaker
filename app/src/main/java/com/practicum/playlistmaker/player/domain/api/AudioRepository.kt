@@ -4,8 +4,8 @@ import com.practicum.playlistmaker.player.data.dto.PlayerState
 import kotlinx.coroutines.flow.StateFlow
 
 interface AudioRepository {
-    val playerStateFlow: StateFlow<PlayerState>
     fun preparePlayer(url: String)
+    val playerStateFlow: StateFlow<PlayerState>
     fun startPlayer()
     fun pausePlayer()
     fun playbackControl()
