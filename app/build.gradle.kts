@@ -55,6 +55,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.media3.extractor)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.ui.tooling.preview.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
