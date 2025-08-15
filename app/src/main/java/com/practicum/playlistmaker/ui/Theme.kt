@@ -16,6 +16,8 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Color(0xFF1A1B22),
     surface = Color(0xFFAEAFB4),
     onSurface = Color(0xFFD9DAE2),
+    tertiary = Color(0xFFE6E8EB),
+    onTertiary = Color(0xFF9FBBF3)
 )
 
 val YsFontFamily = FontFamily(
