@@ -79,8 +79,7 @@ fun MediaCompose() {
             modifier = Modifier.weight(1f)
         ) { page ->
             when (page) {
-                0 -> FirstScreen()
-                1 -> SecondScreen()
+                // TODO
             }
         }
     }
