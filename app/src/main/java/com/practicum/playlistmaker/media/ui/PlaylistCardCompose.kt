@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.media.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,35 +27,33 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 fun PlaylistCardCompose(
     title: String = "Название плейлиста",
     trackCount: String = "0 tracks",
-    imageRes: Int = R.drawable.placeholder
+    imageRes: Int = R.drawable.placeholder,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .padding(4.dp)
             .padding(bottom = 12.dp)
             .width(160.dp)
             .wrapContentHeight()
-            .clip(RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        Column(
-        ) {
+        Column {
             Image(
                 painter = painterResource(id = imageRes),
                 contentDescription = "Playlist cover",
-                modifier = Modifier
-                    .size(160.dp),
+                modifier = Modifier.size(160.dp),
                 contentScale = ContentScale.Crop
             )
-
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-
-                )
-
+                overflow = TextOverflow.Ellipsis
+            )
             Text(
                 text = trackCount,
                 style = MaterialTheme.typography.bodySmall,

@@ -69,7 +69,7 @@ class FavoritesFragment : Fragment() {
             }
         }
 
-    viewModel.onTrackClickTrigger.observe(viewLifecycleOwner) { track ->
+        viewModel.onTrackClickTrigger.observe(viewLifecycleOwner) { track ->
             openPlayer(track)
         }
     }
