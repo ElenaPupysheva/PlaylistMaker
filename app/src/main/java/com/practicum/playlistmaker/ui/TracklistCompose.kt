@@ -63,26 +63,25 @@ fun TracklistCompose(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = dimensionResource(R.dimen.size_6dp))
             )
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = artistName,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    overflow = TextOverflow.Ellipsis
                 )
+                Spacer(Modifier.width(4.dp))
                 Image(
                     painter = painterResource(R.drawable.ic),
                     contentDescription = null,
                     modifier = Modifier.size(dimensionResource(R.dimen.size_13dp))
                 )
+                Spacer(Modifier.width(4.dp))
                 Text(
                     text = trackTime,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                    modifier = Modifier.padding(start = 4.dp)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
         }

@@ -34,7 +34,6 @@ fun SettingsCompose(viewModel: SettingsViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.mar_26dp)),
                 colors = topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
@@ -58,12 +57,9 @@ fun SettingsCompose(viewModel: SettingsViewModel) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = dimensionResource(R.dimen.top_mar))
                     .padding(
                         start = dimensionResource(R.dimen.us_padSt),
-                        end = dimensionResource(R.dimen.us_padEn),
-                        top = dimensionResource(R.dimen.pad_vertical),
-                        bottom = dimensionResource(R.dimen.pad_vertical)
+                        end = dimensionResource(R.dimen.us_padEn)
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {

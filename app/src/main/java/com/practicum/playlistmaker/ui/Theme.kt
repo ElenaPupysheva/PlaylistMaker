@@ -89,13 +89,13 @@ private val AppTypography = Typography(
         fontSize = 16.sp,
         lineHeight = 20.sp
     ),
-    bodyMedium = TextStyle( // 14sp
+    bodyMedium = TextStyle(
         fontFamily = YsFontFamily,
         fontWeight = FontWeight.W400,
         fontSize = 14.sp,
         lineHeight = 18.sp
     ),
-    bodySmall = TextStyle( // 13sp
+    bodySmall = TextStyle(
         fontFamily = YsFontFamily,
         fontWeight = FontWeight.W400,
         fontSize = 13.sp,

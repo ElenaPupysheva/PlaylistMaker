@@ -25,7 +25,7 @@ data class SearchUiState(
     val stringValue: String = ""
 )
 
-class SearchViewModel(
+open class SearchViewModel(
     private val tracksInteractor: TracksInteractor,
     private val historyInteractor: HistoryInteractor
 ) : ViewModel() {

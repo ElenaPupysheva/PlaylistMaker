@@ -29,45 +29,59 @@ fun MediaCompose(
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { 2 })
 
-    TopAppBar(
-        modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.mar_26dp)),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.onPrimary,
-            titleContentColor = MaterialTheme.colorScheme.onSecondary
-        ),
-        title = {
-            Text(
-                text = stringResource(R.string.mediatecha), // если у вас строка называется "media", замените
-                style = MaterialTheme.typography.headlineMedium.copy(fontFamily = YsFontFamily)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    titleContentColor = MaterialTheme.colorScheme.onSecondary
+                ),
+                title = {
+                    Text(
+                        text = stringResource(R.string.mediatecha),
+                        style = MaterialTheme.typography.headlineMedium.copy(fontFamily = YsFontFamily)
+                    )
+                }
             )
-        }
-    )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets.systemBars
+    ) { innerPadding ->
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
-            listOf(
-                stringResource(R.string.favorites),
-                stringResource(R.string.playlists)
-            ).forEachIndexed { index, title ->
-                Tab(
-                    selected = pagerState.currentPage == index,
-                    onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                    text = { Text(title) }
-                )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            TabRow(
+                selectedTabIndex = pagerState.currentPage,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                listOf(
+                    stringResource(R.string.favorites),
+                    stringResource(R.string.playlists)
+                ).forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        text = { Text(title) }
+                    )
+                }
             }
-        }
 
-        HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
-            when (page) {
-                0 -> FavoritesCompose(
-                    viewModel = favoritesViewModel,
-                    onOpenPlayer = onOpenPlayer
-                )
-                1 -> PlaylistsCompose(
-                    viewModel = playlistsViewModel,
-                    onCreateNew = onCreateNewPlaylist,
-                    onOpenDetails = onOpenDetails
-                )
+            HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
+                when (page) {
+                    0 -> FavoritesCompose(
+                        viewModel = favoritesViewModel,
+                        onOpenPlayer = onOpenPlayer
+                    )
+
+                    1 -> PlaylistsCompose(
+                        viewModel = playlistsViewModel,
+                        onCreateNew = onCreateNewPlaylist,
+                        onOpenDetails = onOpenDetails
+                    )
+                }
             }
         }
     }

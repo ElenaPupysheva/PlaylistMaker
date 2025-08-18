@@ -33,7 +33,6 @@ import com.practicum.playlistmaker.ui.theme.YsFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchCompose(viewModel: SearchViewModel) {
@@ -43,26 +42,30 @@ fun SearchCompose(viewModel: SearchViewModel) {
 
     var clickEnabled by remember { mutableStateOf(true) }
     val openTrack: (Track) -> Unit = remember {
-        {
+        { track ->
             if (clickEnabled) {
                 clickEnabled = false
-                viewModel.onTrackClick(it)
+
+                viewModel.onTrackClick(track)
                 ctx.startActivity(
-                    Intent(ctx, PlayerActivity::class.java).putExtra(EXTRA_TRACK, Gson().toJson(it))
+                    Intent(ctx, PlayerActivity::class.java)
+                        .putExtra(EXTRA_TRACK, Gson().toJson(track))
                 )
-                scope.launch { delay(CLICK_DEBOUNCE_DELAY); clickEnabled = true }
+
+                scope.launch {
+                    delay(CLICK_DEBOUNCE_DELAY)
+                    clickEnabled = true
+                }
             }
         }
     }
-
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                modifier = Modifier.padding(bottom = dimensionResource(R.dimen.mar_26dp)),
                 colors = topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 title = {
                     Text(
@@ -74,23 +77,27 @@ fun SearchCompose(viewModel: SearchViewModel) {
                 }
             )
         },
+        containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.systemBars
-    ) { inner ->
-        Column(Modifier
-            .fillMaxSize()
-            .padding(inner)) {
+    ) { innerPadding ->
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            // Search field
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.size_52dp))
-                    .padding(horizontal = dimensionResource(R.dimen.small_icon_pad)),
+                    .height(dimensionResource(id = R.dimen.size_52dp))
+                    .padding(horizontal = dimensionResource(id = R.dimen.small_icon_pad)),
                 contentAlignment = Alignment.Center
             ) {
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.size_36dp))
+                        .height(dimensionResource(id = R.dimen.size_36dp))
                         .onFocusChanged { if (it.isFocused) viewModel.onFocusGained() },
                     value = state.stringValue,
                     onValueChange = viewModel::onTextChanged,
@@ -99,8 +106,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.search_bar_icon),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            contentDescription = null
                         )
                     },
                     trailingIcon = {
@@ -111,8 +117,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                             }) {
                                 Icon(
                                     painter = painterResource(R.drawable.clear_search),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    contentDescription = null
                                 )
                             }
                         }
@@ -125,27 +130,32 @@ fun SearchCompose(viewModel: SearchViewModel) {
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.surface,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                         cursorColor = MaterialTheme.colorScheme.primary,
                         focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
                     )
                 )
             }
 
-            Spacer(Modifier.height(dimensionResource(R.dimen.size_6dp)))
+            Spacer(Modifier.height(dimensionResource(id = R.dimen.size_6dp)))
 
             Box(Modifier.fillMaxSize()) {
                 when {
                     state.isLoading -> {
                         CircularProgressIndicator(
                             modifier = Modifier
-                                .size(dimensionResource(R.dimen.size_44dp))
+                                .size(dimensionResource(id = R.dimen.size_44dp))
                                 .align(Alignment.TopCenter)
-                                .padding(top = dimensionResource(R.dimen.size_140dp)),
+                                .padding(top = dimensionResource(id = R.dimen.size_140dp)),
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -155,6 +165,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                             Text(
                                 text = stringResource(R.string.you_search),
                                 style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                             LazyColumn(
@@ -162,7 +173,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                     .weight(1f)
                                     .fillMaxWidth(),
                                 contentPadding = PaddingValues(
-                                    top = dimensionResource(R.dimen.us_padSt),
+                                    top = dimensionResource(id = R.dimen.us_padSt),
                                     bottom = 16.dp
                                 )
                             ) {
@@ -181,9 +192,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                     if (i < state.historyList.lastIndex) {
                                         Divider(
                                             thickness = 0.5.dp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                0.4f
-                                            )
+                                            color = MaterialTheme.colorScheme.outlineVariant
                                         )
                                     }
                                 }
@@ -194,8 +203,8 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                     .padding(start = 16.dp, end = 16.dp, bottom = 80.dp)
                                     .fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.onSurface,
-                                    contentColor = MaterialTheme.colorScheme.background
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                                 ),
                                 shape = MaterialTheme.shapes.large
                             ) { Text(stringResource(R.string.history_clear)) }
@@ -216,12 +225,11 @@ fun SearchCompose(viewModel: SearchViewModel) {
                         )
                     }
 
-
                     else -> {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(
-                                top = dimensionResource(R.dimen.us_padSt),
+                                top = dimensionResource(id = R.dimen.us_padSt),
                                 bottom = 16.dp
                             )
                         ) {
@@ -240,7 +248,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                 if (i < state.trackList.lastIndex) {
                                     Divider(
                                         thickness = 0.5.dp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.4f)
+                                        color = MaterialTheme.colorScheme.outlineVariant
                                     )
                                 }
                             }
@@ -264,16 +272,24 @@ fun ErrorWithRetry(
     }
 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(painter = painterResource(iconRes), contentDescription = null)
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(Modifier.height(16.dp))
-        Text(text = stringResource(textRes), style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = stringResource(textRes),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         if (showRetry) {
             Spacer(Modifier.height(24.dp))
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSurface,
-                    contentColor = MaterialTheme.colorScheme.background
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 shape = MaterialTheme.shapes.large
             ) { Text(stringResource(R.string.error_refresh)) }
