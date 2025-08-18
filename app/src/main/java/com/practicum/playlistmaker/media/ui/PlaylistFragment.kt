@@ -9,18 +9,18 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.media.domain.PlaylistInteractor
+import com.practicum.playlistmaker.media.presentation.PlaylistsViewModel
 import com.practicum.playlistmaker.ui.theme.PlaylistMakerTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistFragment : Fragment() {
 
-    private val playlistInteractor: PlaylistInteractor by inject()
+    private val vm: PlaylistsViewModel by viewModel()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         val nav = findNavController()
         return ComposeView(requireContext()).apply {
@@ -28,9 +28,7 @@ class PlaylistFragment : Fragment() {
             setContent {
                 PlaylistMakerTheme {
                     PlaylistsCompose(
-                        loadPlaylists = {
-                            withContext(Dispatchers.IO) { playlistInteractor.getAllPlaylists() }
-                        },
+                        viewModel = vm,
                         onCreateNew = { nav.navigate(R.id.newPlaylistFragment) },
                         onOpenDetails = { id ->
                             nav.navigate(

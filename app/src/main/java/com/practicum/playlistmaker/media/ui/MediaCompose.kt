@@ -11,18 +11,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.media.presentation.FavoritesViewModel
+import com.practicum.playlistmaker.media.presentation.PlaylistsViewModel
 import com.practicum.playlistmaker.ui.theme.YsFontFamily
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MediaCompose(
-    viewModel: FavoritesViewModel,
+    favoritesViewModel: FavoritesViewModel,
+    playlistsViewModel: PlaylistsViewModel,
     onOpenPlayer: (Track) -> Unit,
-    loadPlaylists: suspend () -> List<Playlist>,
     onOpenDetails: (Long) -> Unit,
     onCreateNewPlaylist: () -> Unit,
 ) {
@@ -37,7 +37,7 @@ fun MediaCompose(
         ),
         title = {
             Text(
-                text = stringResource(R.string.media),
+                text = stringResource(R.string.mediatecha), // если у вас строка называется "media", замените
                 style = MaterialTheme.typography.headlineMedium.copy(fontFamily = YsFontFamily)
             )
         }
@@ -59,9 +59,12 @@ fun MediaCompose(
 
         HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
             when (page) {
-                0 -> FavoritesCompose(viewModel = viewModel, onOpenPlayer = onOpenPlayer)
+                0 -> FavoritesCompose(
+                    viewModel = favoritesViewModel,
+                    onOpenPlayer = onOpenPlayer
+                )
                 1 -> PlaylistsCompose(
-                    loadPlaylists = loadPlaylists,
+                    viewModel = playlistsViewModel,
                     onCreateNew = onCreateNewPlaylist,
                     onOpenDetails = onOpenDetails
                 )

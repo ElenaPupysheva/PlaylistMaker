@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.settings.ui
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -26,7 +25,6 @@ import com.practicum.playlistmaker.ui.theme.YsFontFamily
 fun SettingsCompose(viewModel: SettingsViewModel) {
     val context = LocalContext.current
     val app = context.applicationContext as App
-
     val isDarkTheme by viewModel.darkThemeEnabled.observeAsState(initial = app.darkTheme)
 
     LaunchedEffect(isDarkTheme) {
@@ -38,8 +36,8 @@ fun SettingsCompose(viewModel: SettingsViewModel) {
             TopAppBar(
                 modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.mar_26dp)),
                 colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimary,
-                    titleContentColor = MaterialTheme.colorScheme.onSecondary
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 ),
                 title = {
                     Text(
@@ -48,39 +46,60 @@ fun SettingsCompose(viewModel: SettingsViewModel) {
                     )
                 }
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets.systemBars
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.onPrimary)
-                .padding(
-                    start = dimensionResource(id = R.dimen.us_padSt),
-                    end = dimensionResource(id = R.dimen.us_padSt)
-                )
         ) {
-            DarkThemeRow(
-                checked = isDarkTheme,
-                onToggle = { viewModel.onThemeToggled(it) }
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = dimensionResource(R.dimen.top_mar))
+                    .padding(
+                        start = dimensionResource(R.dimen.us_padSt),
+                        end = dimensionResource(R.dimen.us_padEn),
+                        top = dimensionResource(R.dimen.pad_vertical),
+                        bottom = dimensionResource(R.dimen.pad_vertical)
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.dark_theme),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                SwitchWithCustomColors(
+                    checked = isDarkTheme,
+                    onCheckedChange = { viewModel.onThemeToggled(it) }
+                )
+            }
 
-            Spacer(Modifier.height(8.dp))
-
-            SettingsRow(textResId = R.string.share, iconResId = R.drawable.share) {
+            SettingsRow(
+                textResId = R.string.share,
+                iconResId = R.drawable.share
+            ) {
                 val shareMessage = context.getString(R.string.link_course)
                 val intent = Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
                     putExtra(Intent.EXTRA_TEXT, shareMessage)
                 }
                 context.startActivity(
-                    Intent.createChooser(intent, context.getString(R.string.share_text))
+                    Intent.createChooser(
+                        intent,
+                        context.getString(R.string.share_text)
+                    )
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
-
-            SettingsRow(textResId = R.string.support, iconResId = R.drawable.support) {
+            SettingsRow(
+                textResId = R.string.support,
+                iconResId = R.drawable.support
+            ) {
                 val message = context.getString(R.string.message_text)
                 val theme = context.getString(R.string.theme_text)
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
@@ -92,9 +111,10 @@ fun SettingsCompose(viewModel: SettingsViewModel) {
                 context.startActivity(intent)
             }
 
-            Spacer(Modifier.height(8.dp))
-
-            SettingsRow(textResId = R.string.user_agree, iconResId = R.drawable.forward) {
+            SettingsRow(
+                textResId = R.string.user_agree,
+                iconResId = R.drawable.forward
+            ) {
                 val intent = Intent(
                     Intent.ACTION_VIEW,
                     Uri.parse(context.getString(R.string.link_agreement))
@@ -114,14 +134,24 @@ private fun SettingsRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = dimensionResource(id = R.dimen.us_padSt)),
+            .padding(
+                start = dimensionResource(R.dimen.us_padSt),
+                end = dimensionResource(R.dimen.us_padEn),
+                top = dimensionResource(R.dimen.pad_vertical),
+                bottom = dimensionResource(R.dimen.pad_vertical)
+            )
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = stringResource(textResId), modifier = Modifier.weight(1f))
+        Text(
+            text = stringResource(textResId),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSecondary,
+            modifier = Modifier.weight(1f)
+        )
         iconResId?.let {
             Icon(
-                painter = painterResource(id = it),
+                painter = painterResource(it),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -140,22 +170,8 @@ private fun SwitchWithCustomColors(
         colors = SwitchDefaults.colors(
             checkedThumbColor = MaterialTheme.colorScheme.primary,
             checkedTrackColor = MaterialTheme.colorScheme.onTertiary,
-            uncheckedThumbColor = MaterialTheme.colorScheme.surface,
-            uncheckedTrackColor = MaterialTheme.colorScheme.tertiary,
+            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            uncheckedTrackColor = MaterialTheme.colorScheme.onTertiary
         )
     )
-}
-
-@Composable
-private fun DarkThemeRow(
-    checked: Boolean,
-    onToggle: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = stringResource(R.string.dark_theme), modifier = Modifier.weight(1f))
-        SwitchWithCustomColors(checked = checked, onCheckedChange = onToggle)
-    }
 }

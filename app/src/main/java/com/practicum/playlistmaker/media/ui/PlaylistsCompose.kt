@@ -1,121 +1,103 @@
 package com.practicum.playlistmaker.media.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.domain.models.Playlist
-import kotlinx.coroutines.launch
+import com.practicum.playlistmaker.media.presentation.PlaylistsState
+import com.practicum.playlistmaker.media.presentation.PlaylistsViewModel
 
 @Composable
 fun PlaylistsCompose(
-    loadPlaylists: suspend () -> List<Playlist>,
+    viewModel: PlaylistsViewModel,
     onCreateNew: () -> Unit,
-    onOpenDetails: (Long) -> Unit
+    onOpenDetails: (Long) -> Unit,
 ) {
-    var loading by remember { mutableStateOf(true) }
-    var playlists by remember { mutableStateOf<List<Playlist>>(emptyList()) }
-    val scope = rememberCoroutineScope()
-    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(Unit) { viewModel.getAllPlaylists() }
 
-    LaunchedEffect(Unit) {
-        playlists = loadPlaylists()
-        loading = false
-    }
-
-    // аналог onResume()
-    DisposableEffect(lifecycleOwner) {
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
-                scope.launch {
-                    loading = true
-                    playlists = loadPlaylists()
-                    loading = false
-                }
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
+    val state = viewModel.observeState().observeAsState(PlaylistsState.Loading).value
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = dimensionResource(R.dimen.main_padSt))
     ) {
         Button(
             onClick = onCreateNew,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(top = 16.dp)
-        ) {
-            Text(text = stringResource(R.string.new_playlist))
-        }
+                .padding(top = dimensionResource(R.dimen.top_mar)),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.onSurface,
+                contentColor = MaterialTheme.colorScheme.background
+            ),
+            shape = MaterialTheme.shapes.large
+        ) { Text(text = stringResource(R.string.new_playlist)) }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(dimensionResource(R.dimen.main_padSt)))
 
-        when {
-            loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        when (state) {
+            PlaylistsState.Loading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(dimensionResource(R.dimen.size_44dp))
+                            .padding(top = dimensionResource(R.dimen.size_140dp)),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
 
-            playlists.isEmpty() -> EmptyPlaylistsPlaceholder()
-            else -> PlaylistsGrid(playlists = playlists, onOpenDetails = onOpenDetails)
-        }
-    }
-}
+            PlaylistsState.Empty -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.error_search),
+                        contentDescription = null
+                    )
+                    Spacer(Modifier.height(dimensionResource(R.dimen.us_padSt)))
+                    Text(
+                        text = stringResource(R.string.media_playlist),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
 
-@Composable
-private fun PlaylistsGrid(
-    playlists: List<Playlist>,
-    onOpenDetails: (Long) -> Unit
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 64.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // ВАЖНО: grid-версия items
-        items(items = playlists, key = { it.id }) { p ->
-            PlaylistCardCompose(
-                title = p.name,
-                trackCount = "${p.trackCount} tracks",
-                onClick = { onOpenDetails(p.id) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyPlaylistsPlaceholder() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 106.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(painter = painterResource(R.drawable.placeholder), contentDescription = null)
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.media_playlist),
-                style = MaterialTheme.typography.bodyLarge
-            )
+            is PlaylistsState.Content -> {
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(bottom = 64.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(state.playlists, key = { it.id }) { p ->
+                        PlaylistCardCompose(
+                            title = p.name,
+                            trackCount = p.trackCount,
+                            coverUrl = p.imagePath,
+                            onClick = { onOpenDetails(p.id) }
+                        )
+                    }
+                }
+            }
         }
     }
 }

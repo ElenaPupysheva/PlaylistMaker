@@ -1,53 +1,39 @@
 package com.practicum.playlistmaker.media.ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.practicum.playlistmaker.R
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.practicum.playlistmaker.ui.GlideCover
 
 @Composable
 fun PlaylistCardCompose(
-    title: String = "Название плейлиста",
-    trackCount: String = "0 tracks",
-    imageRes: Int = R.drawable.placeholder,
+    title: String,
+    trackCount: Int,
+    coverUrl: String?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
     Card(
         modifier = modifier
-            .padding(4.dp)
-            .padding(bottom = 12.dp)
             .width(160.dp)
-            .wrapContentHeight()
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+            .wrapContentHeight(),
+        onClick = onClick,
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column {
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = "Playlist cover",
-                modifier = Modifier.size(160.dp),
-                contentScale = ContentScale.Crop
+        Column(Modifier.padding(8.dp)) {
+            GlideCover(
+                imageUrl = coverUrl,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .clip(MaterialTheme.shapes.large)
             )
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
@@ -55,19 +41,11 @@ fun PlaylistCardCompose(
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = trackCount,
+                text = trackCount.toString(),
                 style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                maxLines = 1
             )
         }
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun PlaylistCardPreview() {
-    MaterialTheme {
-        PlaylistCardCompose()
     }
 }

@@ -47,5 +47,8 @@
     <string name="menu_edit">Редактировать</string>
     <string name="save">Сохранить</string>
 
+    <string name="favorites">Избранные треки</string>
+    <string name="playlists">Плейлисты</string>
+
 
 </resources>
