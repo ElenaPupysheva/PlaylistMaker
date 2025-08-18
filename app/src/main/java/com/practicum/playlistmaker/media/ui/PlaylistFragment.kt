@@ -4,80 +4,47 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
-import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.media.domain.PlaylistInteractor
-import kotlinx.coroutines.launch
+import com.practicum.playlistmaker.ui.theme.PlaylistMakerTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class PlaylistFragment : Fragment() {
-    private var _binding: FragmentPlaylistBinding? = null
-    private val binding get() = _binding!!
 
-    private lateinit var adapter: PlaylistsAdapter
     private val playlistInteractor: PlaylistInteractor by inject()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPlaylistBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.playlistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-
-        binding.newPlaylist.setOnClickListener {
-            findNavController().navigate(com.practicum.playlistmaker.R.id.newPlaylistFragment)
-        }
-
-        loadPlaylists()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        loadPlaylists()
-    }
-
-    private fun loadPlaylists() {
-        lifecycleScope.launch {
-            val playlists: List<Playlist> = playlistInteractor.getAllPlaylists()
-            if (playlists.isEmpty()) {
-                binding.placeholder.visibility = View.VISIBLE
-                binding.playlistsRecyclerView.visibility = View.GONE
-            } else {
-                binding.placeholder.visibility = View.GONE
-                binding.playlistsRecyclerView.visibility = View.VISIBLE
-
-                adapter = PlaylistsAdapter(playlists) { playlistId ->
-                    val bundle = Bundle().apply {
-                        putLong("playlistId", playlistId)
-                    }
-                    findNavController().navigate(R.id.detailedFragment, bundle)
+        val nav = findNavController()
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                PlaylistMakerTheme {
+                    PlaylistsCompose(
+                        loadPlaylists = {
+                            withContext(Dispatchers.IO) { playlistInteractor.getAllPlaylists() }
+                        },
+                        onCreateNew = { nav.navigate(R.id.newPlaylistFragment) },
+                        onOpenDetails = { id ->
+                            nav.navigate(
+                                R.id.detailedFragment,
+                                Bundle().apply { putLong("playlistId", id) }
+                            )
+                        }
+                    )
                 }
-                binding.playlistsRecyclerView.adapter = adapter
             }
         }
     }
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     companion object {
-        fun newInstance(): PlaylistFragment {
-            return PlaylistFragment()
-        }
+        fun newInstance() = PlaylistFragment()
     }
 }
-

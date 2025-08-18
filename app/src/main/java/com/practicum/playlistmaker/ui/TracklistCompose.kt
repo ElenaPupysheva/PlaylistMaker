@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.media.ui
+package com.practicum.playlistmaker.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -26,7 +26,8 @@ import com.practicum.playlistmaker.R
 fun TracklistCompose(
     trackName: String = "Название песни",
     artistName: String = "Исполнитель",
-    trackTime: String = "00:00"
+    trackTime: String = "00:00",
+    imageUrl: String?
 ) {
     Row(
         modifier = Modifier
@@ -93,13 +94,5 @@ fun TracklistCompose(
             modifier = Modifier
                 .padding(end = dimensionResource(R.dimen.us_padEn))
         )
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun TracklistPreview() {
-    MaterialTheme {
-        TracklistCompose()
     }
 }
