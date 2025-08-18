@@ -5,11 +5,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.tv.material3.TabDefaults
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.media.presentation.FavoritesViewModel
@@ -55,7 +59,17 @@ fun MediaCompose(
         ) {
             TabRow(
                 selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                containerColor = Color.Transparent,
+                divider = {},
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier
+                            .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                            .height(2.dp),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             ) {
                 listOf(
                     stringResource(R.string.favorites),
@@ -64,7 +78,16 @@ fun MediaCompose(
                     Tab(
                         selected = pagerState.currentPage == index,
                         onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                        text = { Text(title) }
+                        text = {
+                            Text(
+                                title,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        },
+                        colors = TabDefaults.tabColors(
+                            selectedContentColor = MaterialTheme.colorScheme.onBackground,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
                 }
             }

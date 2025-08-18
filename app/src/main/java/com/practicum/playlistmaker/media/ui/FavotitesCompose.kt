@@ -24,7 +24,6 @@ fun FavoritesCompose(
     viewModel: FavoritesViewModel,
     onOpenPlayer: (Track) -> Unit
 ) {
-    // загрузка при первом показе
     LaunchedEffect(Unit) { viewModel.loadFavorites() }
 
     val state = viewModel.state.observeAsState(FavoriteState.Loading).value
@@ -79,12 +78,6 @@ fun FavoritesCompose(
                             artistName = t.artistName.orEmpty(),
                             trackTime = t.trackTimeMillis.toMmSs(),
                             imageUrl = t.artworkUrl100
-                        )
-                    }
-                    if (i < state.tracks.lastIndex) {
-                        Divider(
-                            thickness = 0.5.dp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.4f)
                         )
                     }
                 }

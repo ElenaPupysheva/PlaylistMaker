@@ -1,18 +1,20 @@
 package com.practicum.playlistmaker.search.ui
 
 import android.content.Intent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -39,6 +41,14 @@ fun SearchCompose(viewModel: SearchViewModel) {
     val state by viewModel.uiState.observeAsState(SearchUiState())
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
+    val isDark = isSystemInDarkTheme()
+    val fieldContainer = if (isDark) Color.White else Color(0xFFE6E8EB)
+    val placeholderColor = if (isDark)
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+    else
+        Color(0xFFAEAFB4)
+    val iconTint = if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFFAEAFB4)
+    val inputTextColor = Color(0xFF1A1B22)
 
     var clickEnabled by remember { mutableStateOf(true) }
     val openTrack: (Track) -> Unit = remember {
@@ -62,10 +72,11 @@ fun SearchCompose(viewModel: SearchViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 title = {
                     Text(
@@ -80,13 +91,11 @@ fun SearchCompose(viewModel: SearchViewModel) {
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.systemBars
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Search field
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,20 +103,32 @@ fun SearchCompose(viewModel: SearchViewModel) {
                     .padding(horizontal = dimensionResource(id = R.dimen.small_icon_pad)),
                 contentAlignment = Alignment.Center
             ) {
-                OutlinedTextField(
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = fieldContainer,
+                    tonalElevation = 0.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(dimensionResource(id = R.dimen.size_36dp))
-                        .onFocusChanged { if (it.isFocused) viewModel.onFocusGained() },
+                        .height(36.dp)
+                ) {}
+                TextField(
                     value = state.stringValue,
                     onValueChange = viewModel::onTextChanged,
                     singleLine = true,
-                    placeholder = { Text(stringResource(R.string.search)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.search_bar_icon),
-                            contentDescription = null
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp)
+                        .onFocusChanged { if (it.isFocused) viewModel.onFocusGained() },
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.search),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = placeholderColor,
+                            maxLines = 1
                         )
+                    },
+                    leadingIcon = {
+                        Icon(painterResource(R.drawable.search_bar_icon), null, tint = iconTint)
                     },
                     trailingIcon = {
                         if (state.stringValue.isNotEmpty()) {
@@ -116,35 +137,41 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                 viewModel.onFocusGained()
                             }) {
                                 Icon(
-                                    painter = painterResource(R.drawable.clear_search),
-                                    contentDescription = null
+                                    painterResource(R.drawable.clear_search),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = { viewModel.performSearch(state.stringValue) }
-                    ),
-                    shape = MaterialTheme.shapes.small,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        disabledContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    keyboardActions = KeyboardActions(onDone = { viewModel.performSearch(state.stringValue) }),
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = inputTextColor),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+
+                        focusedTextColor = inputTextColor,
+                        unfocusedTextColor = inputTextColor,
+
+                        focusedPlaceholderColor = placeholderColor,
+                        unfocusedPlaceholderColor = placeholderColor,
+
+                        focusedLeadingIconColor = iconTint,
+                        unfocusedLeadingIconColor = iconTint,
                         focusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
+
+        }
 
             Spacer(Modifier.height(dimensionResource(id = R.dimen.size_6dp)))
 
@@ -166,11 +193,13 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                 text = stringResource(R.string.you_search),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             LazyColumn(
                                 modifier = Modifier
-                                    .weight(1f)
                                     .fillMaxWidth(),
                                 contentPadding = PaddingValues(
                                     top = dimensionResource(id = R.dimen.us_padSt),
@@ -189,25 +218,27 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                             imageUrl = track.artworkUrl100
                                         )
                                     }
-                                    if (i < state.historyList.lastIndex) {
-                                        Divider(
-                                            thickness = 0.5.dp,
-                                            color = MaterialTheme.colorScheme.outlineVariant
-                                        )
-                                    }
                                 }
                             }
                             Button(
                                 onClick = viewModel::clearHistory,
                                 modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp, bottom = 80.dp)
-                                    .fillMaxWidth(),
+                                    .align(Alignment.CenterHorizontally)
+                                    .width(148.dp)
+                                    .height(36.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                    containerColor = MaterialTheme.colorScheme.onSecondary,
+                                    contentColor = MaterialTheme.colorScheme.secondary
                                 ),
-                                shape = MaterialTheme.shapes.large
-                            ) { Text(stringResource(R.string.history_clear)) }
+                                shape = MaterialTheme.shapes.large,
+                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    stringResource(R.string.history_clear),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = 1
+                                )
+                            }
                         }
                     }
 
@@ -245,18 +276,11 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                         imageUrl = track.artworkUrl100
                                     )
                                 }
-                                if (i < state.trackList.lastIndex) {
-                                    Divider(
-                                        thickness = 0.5.dp,
-                                        color = MaterialTheme.colorScheme.outlineVariant
-                                    )
-                                }
                             }
                         }
                     }
                 }
             }
-        }
     }
 }
 

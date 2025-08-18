@@ -28,7 +28,6 @@ private val SecondaryLight = Color(0xFFF5F5F5)
 private val BgDark = Color(0xFF1A1B22)
 private val TextDark = Color(0xFFFFFFFF)
 
-
 private val LightColorScheme = lightColorScheme(
     primary = BluePrimary,
     onPrimary = Color.White,
