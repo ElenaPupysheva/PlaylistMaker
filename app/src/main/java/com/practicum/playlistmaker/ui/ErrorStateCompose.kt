@@ -20,7 +20,8 @@ fun ErrorStateCompose(
     type: ErrorType,
     modifier: Modifier = Modifier,
     message: String = "",
-    onRetry: (() -> Unit)? = null
+    onRetry: (() -> Unit)? = null,
+    centerVertically: Boolean = true,
 ) {
     val isDark = isSystemInDarkTheme()
 
@@ -30,25 +31,20 @@ fun ErrorStateCompose(
             stringResource(R.string.nothing_found),
             false
         )
-
         ErrorType.Network -> Triple(
             if (isDark) R.drawable.error_net_night else R.drawable.error_net_light,
             stringResource(R.string.error_net),
             true
         )
     }
-
     val textToShow = if (message.isNotBlank()) message else defaultText
-
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = if (centerVertically)
+            Arrangement.Center else Arrangement.Top
     ) {
-        Image(
-            painter = painterResource(iconRes),
-            contentDescription = null
-        )
+        Image(painter = painterResource(iconRes), contentDescription = null)
         Spacer(Modifier.height(16.dp))
         Text(
             text = textToShow,
@@ -65,9 +61,7 @@ fun ErrorStateCompose(
                     containerColor = MaterialTheme.colorScheme.onSurface,
                     contentColor = MaterialTheme.colorScheme.background
                 )
-            ) {
-                Text(text = stringResource(R.string.error_refresh))
-            }
+            ) { Text(stringResource(R.string.error_refresh)) }
         }
     }
 }

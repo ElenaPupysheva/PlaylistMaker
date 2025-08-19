@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.tv.material)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,4 +97,5 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.runtime:runtime-rxjava2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("androidx.compose.animation:animation")
 }

@@ -10,11 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+
 import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
@@ -127,6 +128,8 @@ private fun SettingsRow(
     iconResId: Int? = null,
     onClick: () -> Unit
 ) {
+    val contentColor = MaterialTheme.colorScheme.onSecondary
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,14 +145,18 @@ private fun SettingsRow(
         Text(
             text = stringResource(textResId),
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSecondary,
+            color = contentColor,
             modifier = Modifier.weight(1f)
         )
-        iconResId?.let {
-            Icon(
-                painter = painterResource(it),
+
+        iconResId?.let { res ->
+            androidx.compose.foundation.Image(
+                painter = painterResource(res),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface
+                colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(
+                    color = contentColor,
+                    blendMode = androidx.compose.ui.graphics.BlendMode.SrcIn
+                )
             )
         }
     }

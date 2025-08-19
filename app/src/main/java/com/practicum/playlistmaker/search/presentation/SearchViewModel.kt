@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.search.domain.api.HistoryInteractor
 import com.practicum.playlistmaker.search.domain.api.TracksInteractor
-import com.practicum.playlistmaker.search.ui.SearchError
+import com.practicum.playlistmaker.search.presentation.SearchError
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch

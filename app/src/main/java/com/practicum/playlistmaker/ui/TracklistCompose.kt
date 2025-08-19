@@ -92,7 +92,6 @@ fun TracklistCompose(
         Image(
             painter = painterResource(R.drawable.forward_track),
             contentDescription = null,
-            modifier = Modifier.padding(end = dimensionResource(R.dimen.us_padEn))
         )
     }
 }

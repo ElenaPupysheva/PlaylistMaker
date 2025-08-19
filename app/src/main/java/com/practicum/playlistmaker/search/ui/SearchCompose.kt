@@ -1,6 +1,8 @@
 package com.practicum.playlistmaker.search.ui
 
 import android.content.Intent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,14 +30,15 @@ import com.practicum.playlistmaker.domain.models.CLICK_DEBOUNCE_DELAY
 import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.player.ui.PlayerActivity
+import com.practicum.playlistmaker.search.presentation.SearchError
 import com.practicum.playlistmaker.search.presentation.SearchUiState
 import com.practicum.playlistmaker.search.presentation.SearchViewModel
+import com.practicum.playlistmaker.ui.ErrorStateCompose
+import com.practicum.playlistmaker.ui.ErrorType
 import com.practicum.playlistmaker.ui.TracklistCompose
 import com.practicum.playlistmaker.ui.theme.YsFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.practicum.playlistmaker.ui.ErrorStateCompose
-import com.practicum.playlistmaker.ui.ErrorType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,12 +47,13 @@ fun SearchCompose(viewModel: SearchViewModel) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     val isDark = isSystemInDarkTheme()
+
     val fieldContainer = if (isDark) Color.White else Color(0xFFE6E8EB)
     val placeholderColor =
-        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-        else Color(0xFFAEAFB4)
-    val iconTint =
-        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFFAEAFB4)
+        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f) else Color(
+            0xFFAEAFB4
+        )
+    val iconTint = if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFFAEAFB4)
     val inputTextColor = Color(0xFF1A1B22)
 
     var clickEnabled by remember { mutableStateOf(true) }
@@ -92,13 +96,11 @@ fun SearchCompose(viewModel: SearchViewModel) {
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.systemBars
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Поле поиска
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -180,8 +182,17 @@ fun SearchCompose(viewModel: SearchViewModel) {
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                when {
-                    state.isLoading -> {
+                val showLoading = state.isLoading
+                val showHistory = state.showHistory
+                val showError = state.error != null
+                val showList = !showLoading && !showHistory && !showError
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showLoading,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Box(Modifier.fillMaxSize()) {
                         CircularProgressIndicator(
                             modifier = Modifier
                                 .size(dimensionResource(id = R.dimen.size_44dp))
@@ -190,66 +201,70 @@ fun SearchCompose(viewModel: SearchViewModel) {
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
+                }
 
-                    state.showHistory -> {
-                        Column(Modifier.fillMaxSize()) {
-                            Text(
-                                text = stringResource(R.string.you_search),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showHistory,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Column(Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(R.string.you_search),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(
+                                top = dimensionResource(id = R.dimen.us_padSt),
+                                bottom = 16.dp
                             )
-                            LazyColumn(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentPadding = PaddingValues(
-                                    top = dimensionResource(id = R.dimen.us_padSt),
-                                    bottom = 16.dp
-                                )
-                            ) {
-                                itemsIndexed(
-                                    state.historyList,
-                                    key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
-                                ) { _, track ->
-                                    Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
-                                        TracklistCompose(
-                                            trackName = track.trackName.orEmpty(),
-                                            artistName = track.artistName.orEmpty(),
-                                            trackTime = track.trackTimeMillis.toMmSs(),
-                                            imageUrl = track.artworkUrl100
-                                        )
-                                    }
+                        ) {
+                            itemsIndexed(
+                                state.historyList,
+                                key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
+                            ) { _, track ->
+                                Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
+                                    TracklistCompose(
+                                        trackName = track.trackName.orEmpty(),
+                                        artistName = track.artistName.orEmpty(),
+                                        trackTime = track.trackTimeMillis.toMmSs(),
+                                        imageUrl = track.artworkUrl100
+                                    )
                                 }
                             }
-                            Button(
-                                onClick = viewModel::clearHistory,
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .width(148.dp)
-                                    .height(36.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.onSecondary,
-                                    contentColor = MaterialTheme.colorScheme.secondary
-                                ),
-                                shape = MaterialTheme.shapes.large,
-                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp)
-                            ) {
-                                Text(
-                                    stringResource(R.string.history_clear),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    maxLines = 1
-                                )
-                            }
+                        }
+                        Button(
+                            onClick = viewModel::clearHistory,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .width(148.dp)
+                                .height(36.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onSecondary,
+                                contentColor = MaterialTheme.colorScheme.secondary
+                            ),
+                            shape = MaterialTheme.shapes.large,
+                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp)
+                        ) {
+                            Text(stringResource(R.string.history_clear), maxLines = 1)
                         }
                     }
+                }
 
-                    state.error != null -> {
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showError, enter = fadeIn(), exit = fadeOut()
+                ) {
+                    Box(Modifier.fillMaxSize()) {
                         val errorType = when (state.error) {
                             SearchError.NotFound -> ErrorType.NotFound
                             SearchError.Network -> ErrorType.Network
-                            else -> error("Unsupported SearchError: ${state.error}")
+                            else -> ErrorType.NotFound
                         }
                         ErrorStateCompose(
                             type = errorType,
@@ -263,33 +278,37 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                     if (q.isNotBlank()) viewModel.performSearch(q)
                                 }
                             } else null,
+                            centerVertically = false,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .align(Alignment.TopCenter)
                                 .padding(top = 102.dp)
                         )
                     }
+                }
 
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(
-                                top = dimensionResource(id = R.dimen.us_padSt),
-                                bottom = 16.dp
-                            )
-                        ) {
-                            itemsIndexed(
-                                state.trackList,
-                                key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
-                            ) { _, track ->
-                                Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
-                                    TracklistCompose(
-                                        trackName = track.trackName.orEmpty(),
-                                        artistName = track.artistName.orEmpty(),
-                                        trackTime = track.trackTimeMillis.toMmSs(),
-                                        imageUrl = track.artworkUrl100
-                                    )
-                                }
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showList,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            top = dimensionResource(id = R.dimen.us_padSt),
+                            bottom = 16.dp
+                        )
+                    ) {
+                        itemsIndexed(
+                            state.trackList,
+                            key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
+                        ) { _, track ->
+                            Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
+                                TracklistCompose(
+                                    trackName = track.trackName.orEmpty(),
+                                    artistName = track.artistName.orEmpty(),
+                                    trackTime = track.trackTimeMillis.toMmSs(),
+                                    imageUrl = track.artworkUrl100
+                                )
                             }
                         }
                     }
