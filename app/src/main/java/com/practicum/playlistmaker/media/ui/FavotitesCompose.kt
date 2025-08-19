@@ -17,6 +17,8 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.media.presentation.FavoriteState
 import com.practicum.playlistmaker.media.presentation.FavoritesViewModel
+import com.practicum.playlistmaker.ui.ErrorStateCompose
+import com.practicum.playlistmaker.ui.ErrorType
 import com.practicum.playlistmaker.ui.TracklistCompose
 
 @Composable
@@ -41,22 +43,15 @@ fun FavoritesCompose(
                 )
             }
         }
-
         FavoriteState.Empty -> {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 106.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.error_search),
-                    contentDescription = null
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.us_padSt)))
-                Text(
-                    text = stringResource(R.string.media_clean),
-                    style = MaterialTheme.typography.titleMedium
+                ErrorStateCompose(
+                    type = ErrorType.NotFound,
+                    message = stringResource(R.string.media_clean),
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
@@ -71,7 +66,7 @@ fun FavoritesCompose(
                 itemsIndexed(
                     items = state.tracks,
                     key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
-                ) { i, t ->
+                ) { _, t ->
                     Surface(onClick = { viewModel.clickDebounce(t) }, tonalElevation = 0.dp) {
                         TracklistCompose(
                             trackName = t.trackName.orEmpty(),
@@ -84,6 +79,7 @@ fun FavoritesCompose(
             }
         }
     }
+
 
     LaunchedEffect(triggerTrack) {
         triggerTrack?.let { onOpenPlayer(it) }

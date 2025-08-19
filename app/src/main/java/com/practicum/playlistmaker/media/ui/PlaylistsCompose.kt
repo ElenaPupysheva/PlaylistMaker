@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.presentation.PlaylistsState
 import com.practicum.playlistmaker.media.presentation.PlaylistsViewModel
+import com.practicum.playlistmaker.ui.ErrorStateCompose
+import com.practicum.playlistmaker.ui.ErrorType
 
 @Composable
 fun PlaylistsCompose(
@@ -60,22 +62,11 @@ fun PlaylistsCompose(
             }
 
             PlaylistsState.Empty -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.error_search),
-                        contentDescription = null
-                    )
-                    Spacer(Modifier.height(dimensionResource(R.dimen.us_padSt)))
-                    Text(
-                        text = stringResource(R.string.media_playlist),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
+                ErrorStateCompose(
+                    type = ErrorType.NotFound,
+                    message = stringResource(R.string.media_playlist),
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             is PlaylistsState.Content -> {
@@ -84,7 +75,7 @@ fun PlaylistsCompose(
                         .fillMaxSize()
                         .weight(1f),
                     columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(bottom = 64.dp),
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {

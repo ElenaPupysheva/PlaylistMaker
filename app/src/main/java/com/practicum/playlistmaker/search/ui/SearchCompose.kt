@@ -34,6 +34,8 @@ import com.practicum.playlistmaker.ui.TracklistCompose
 import com.practicum.playlistmaker.ui.theme.YsFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.practicum.playlistmaker.ui.ErrorStateCompose
+import com.practicum.playlistmaker.ui.ErrorType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,11 +45,11 @@ fun SearchCompose(viewModel: SearchViewModel) {
     val scope = rememberCoroutineScope()
     val isDark = isSystemInDarkTheme()
     val fieldContainer = if (isDark) Color.White else Color(0xFFE6E8EB)
-    val placeholderColor = if (isDark)
-        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-    else
-        Color(0xFFAEAFB4)
-    val iconTint = if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFFAEAFB4)
+    val placeholderColor =
+        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+        else Color(0xFFAEAFB4)
+    val iconTint =
+        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFFAEAFB4)
     val inputTextColor = Color(0xFF1A1B22)
 
     var clickEnabled by remember { mutableStateOf(true) }
@@ -55,13 +57,11 @@ fun SearchCompose(viewModel: SearchViewModel) {
         { track ->
             if (clickEnabled) {
                 clickEnabled = false
-
                 viewModel.onTrackClick(track)
                 ctx.startActivity(
                     Intent(ctx, PlayerActivity::class.java)
                         .putExtra(EXTRA_TRACK, Gson().toJson(track))
                 )
-
                 scope.launch {
                     delay(CLICK_DEBOUNCE_DELAY)
                     clickEnabled = true
@@ -69,6 +69,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
             }
         }
     }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -91,11 +92,13 @@ fun SearchCompose(viewModel: SearchViewModel) {
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.systemBars
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            // Поле поиска
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -117,18 +120,21 @@ fun SearchCompose(viewModel: SearchViewModel) {
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(36.dp)
                         .onFocusChanged { if (it.isFocused) viewModel.onFocusGained() },
                     placeholder = {
                         Text(
                             text = stringResource(R.string.search),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = placeholderColor,
                             maxLines = 1
                         )
                     },
                     leadingIcon = {
-                        Icon(painterResource(R.drawable.search_bar_icon), null, tint = iconTint)
+                        Icon(
+                            painterResource(R.drawable.search_bar_icon),
+                            null,
+                            tint = iconTint
+                        )
                     },
                     trailingIcon = {
                         if (state.stringValue.isNotEmpty()) {
@@ -154,28 +160,26 @@ fun SearchCompose(viewModel: SearchViewModel) {
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
-
                         focusedTextColor = inputTextColor,
                         unfocusedTextColor = inputTextColor,
-
                         focusedPlaceholderColor = placeholderColor,
                         unfocusedPlaceholderColor = placeholderColor,
-
                         focusedLeadingIconColor = iconTint,
                         unfocusedLeadingIconColor = iconTint,
                         focusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-
                         cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
 
-        }
-
             Spacer(Modifier.height(dimensionResource(id = R.dimen.size_6dp)))
 
-            Box(Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
                 when {
                     state.isLoading -> {
                         CircularProgressIndicator(
@@ -199,8 +203,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 contentPadding = PaddingValues(
                                     top = dimensionResource(id = R.dimen.us_padSt),
                                     bottom = 16.dp
@@ -209,7 +212,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                                 itemsIndexed(
                                     state.historyList,
                                     key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
-                                ) { i, track ->
+                                ) { _, track ->
                                     Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
                                         TracklistCompose(
                                             trackName = track.trackName.orEmpty(),
@@ -243,12 +246,23 @@ fun SearchCompose(viewModel: SearchViewModel) {
                     }
 
                     state.error != null -> {
-                        ErrorWithRetry(
-                            kind = state.error!!,
-                            onRetry = {
-                                val q = state.lastSearchQuery
-                                if (q.isNotBlank()) viewModel.performSearch(q)
+                        val errorType = when (state.error) {
+                            SearchError.NotFound -> ErrorType.NotFound
+                            SearchError.Network -> ErrorType.Network
+                            else -> error("Unsupported SearchError: ${state.error}")
+                        }
+                        ErrorStateCompose(
+                            type = errorType,
+                            message = when (errorType) {
+                                ErrorType.NotFound -> stringResource(R.string.nothing_found)
+                                ErrorType.Network -> stringResource(R.string.error_net)
                             },
+                            onRetry = if (errorType == ErrorType.Network) {
+                                {
+                                    val q = state.lastSearchQuery
+                                    if (q.isNotBlank()) viewModel.performSearch(q)
+                                }
+                            } else null,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.TopCenter)
@@ -267,7 +281,7 @@ fun SearchCompose(viewModel: SearchViewModel) {
                             itemsIndexed(
                                 state.trackList,
                                 key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
-                            ) { i, track ->
+                            ) { _, track ->
                                 Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
                                     TracklistCompose(
                                         trackName = track.trackName.orEmpty(),
@@ -281,42 +295,6 @@ fun SearchCompose(viewModel: SearchViewModel) {
                     }
                 }
             }
-    }
-}
-
-@Composable
-fun ErrorWithRetry(
-    kind: SearchError,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val (iconRes, textRes, showRetry) = when (kind) {
-        SearchError.NotFound -> Triple(R.drawable.error_search, R.string.nothing_found, false)
-        SearchError.Network -> Triple(R.drawable.error_net_light, R.string.error_net, true)
-    }
-
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(16.dp))
-        Text(
-            text = stringResource(textRes),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        if (showRetry) {
-            Spacer(Modifier.height(24.dp))
-            Button(
-                onClick = onRetry,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                shape = MaterialTheme.shapes.large
-            ) { Text(stringResource(R.string.error_refresh)) }
         }
     }
 }

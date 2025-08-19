@@ -4,16 +4,23 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.TabDefaults
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.media.presentation.FavoritesViewModel
@@ -37,13 +44,17 @@ fun MediaCompose(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimary,
-                    titleContentColor = MaterialTheme.colorScheme.onSecondary
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 title = {
                     Text(
                         text = stringResource(R.string.mediatecha),
-                        style = MaterialTheme.typography.headlineMedium.copy(fontFamily = YsFontFamily)
+                        style = MaterialTheme.typography.headlineMedium.copy(fontFamily = YsFontFamily),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             )
@@ -63,7 +74,7 @@ fun MediaCompose(
                 containerColor = Color.Transparent,
                 divider = {},
                 indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
+                    TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier
                             .tabIndicatorOffset(tabPositions[pagerState.currentPage])
                             .height(2.dp),
@@ -75,24 +86,28 @@ fun MediaCompose(
                     stringResource(R.string.favorites),
                     stringResource(R.string.playlists)
                 ).forEachIndexed { index, title ->
+                    val selected = pagerState.currentPage == index
                     Tab(
-                        selected = pagerState.currentPage == index,
+                        selected = selected,
                         onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                         text = {
                             Text(
-                                title,
-                                style = MaterialTheme.typography.titleMedium
+                                text = title,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (selected)
+                                    MaterialTheme.colorScheme.onBackground
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        },
-                        colors = TabDefaults.tabColors(
-                            selectedContentColor = MaterialTheme.colorScheme.onBackground,
-                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        }
                     )
                 }
             }
 
-            HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f)
+            ) { page ->
                 when (page) {
                     0 -> FavoritesCompose(
                         viewModel = favoritesViewModel,

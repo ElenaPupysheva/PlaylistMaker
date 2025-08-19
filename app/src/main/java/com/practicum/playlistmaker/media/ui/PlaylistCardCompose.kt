@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.media.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,7 +32,7 @@ fun PlaylistCardCompose(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp)
-                    .clip(MaterialTheme.shapes.large)
+                    .clip(RoundedCornerShape(8.dp))
             )
             Spacer(Modifier.height(8.dp))
             Text(
