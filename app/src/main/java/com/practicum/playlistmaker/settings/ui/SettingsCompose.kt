@@ -2,8 +2,11 @@ package com.practicum.playlistmaker.settings.ui
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.*
@@ -12,13 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 
 import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
+import com.practicum.playlistmaker.ui.SwitchWithCustomColors
 import com.practicum.playlistmaker.ui.theme.YsFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +66,6 @@ fun SettingsCompose(viewModel: SettingsViewModel) {
                     .fillMaxWidth()
                     .padding(
                         start = dimensionResource(R.dimen.us_padSt),
-                        end = dimensionResource(R.dimen.us_padEn)
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -160,21 +165,4 @@ private fun SettingsRow(
             )
         }
     }
-}
-
-@Composable
-private fun SwitchWithCustomColors(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Switch(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        colors = SwitchDefaults.colors(
-            checkedThumbColor = MaterialTheme.colorScheme.primary,
-            checkedTrackColor = MaterialTheme.colorScheme.onTertiary,
-            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            uncheckedTrackColor = MaterialTheme.colorScheme.onTertiary
-        )
-    )
 }
