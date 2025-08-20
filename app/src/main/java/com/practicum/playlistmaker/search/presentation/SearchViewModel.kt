@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.search.domain.api.HistoryInteractor
 import com.practicum.playlistmaker.search.domain.api.TracksInteractor
-import com.practicum.playlistmaker.search.presentation.SearchError
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -36,19 +36,57 @@ open class SearchViewModel(
     private val handler = Handler(Looper.getMainLooper())
     private val SEARCH_DEBOUNCE_DELAY = 2000L
 
+    private var searchJob: Job? = null
+
     private val searchRunnable = Runnable {
         performSearch(_uiState.value?.stringValue.orEmpty())
     }
 
     fun onTextChanged(newText: String) {
-        // сбрасываем прошлую ошибку при наборе текста
         updateState { it.copy(stringValue = newText, isError = false, error = null) }
         handler.removeCallbacks(searchRunnable)
+
+        if (newText.isBlank()) {
+            searchJob?.cancel()
+            val history = historyInteractor.getHistory()
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    isError = false,
+                    error = null,
+                    trackList = emptyList(),
+                    showHistory = history.isNotEmpty(),
+                    historyList = history,
+                    lastSearchQuery = ""
+                )
+            }
+            return
+        }
+
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     fun performSearch(query: String) {
-        if (query.isBlank()) return
+        handler.removeCallbacks(searchRunnable)
+
+        if (query.isBlank()) {
+            searchJob?.cancel()
+            val history = historyInteractor.getHistory()
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    isError = false,
+                    error = null,
+                    trackList = emptyList(),
+                    showHistory = history.isNotEmpty(),
+                    historyList = history,
+                    lastSearchQuery = ""
+                )
+            }
+            return
+        }
+
+        searchJob?.cancel()
 
         updateState {
             it.copy(
@@ -61,7 +99,7 @@ open class SearchViewModel(
             )
         }
 
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
             tracksInteractor.searchTracks(query)
                 .onStart {
                     updateState { s -> s.copy(isLoading = true, isError = false, error = null) }
@@ -117,21 +155,24 @@ open class SearchViewModel(
                 }
             } else {
                 updateState {
-                    it.copy(
-                        historyList = emptyList(),
-                        showHistory = false
-                    )
+                    it.copy(historyList = emptyList(), showHistory = false)
                 }
             }
         }
     }
 
     fun clearHistory() {
+        handler.removeCallbacks(searchRunnable)
+        searchJob?.cancel()
         historyInteractor.clearHistory()
         updateState {
             it.copy(
                 historyList = emptyList(),
-                showHistory = false
+                showHistory = false,
+                trackList = emptyList(),
+                isLoading = false,
+                isError = false,
+                error = null
             )
         }
     }

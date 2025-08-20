@@ -37,7 +37,6 @@ fun FavoritesCompose(
     val isEmpty = state is FavoriteState.Empty
     val isContent = state is FavoriteState.Content
 
-    // LOADING
     AnimatedVisibility(visible = isLoading, enter = fadeIn(), exit = fadeOut()) {
         Box(Modifier.fillMaxSize()) {
             CircularProgressIndicator(
@@ -50,7 +49,6 @@ fun FavoritesCompose(
         }
     }
 
-    // EMPTY (106dp ниже табов)
     AnimatedVisibility(visible = isEmpty, enter = fadeIn(), exit = fadeOut()) {
         Box(Modifier.fillMaxSize()) {
             ErrorStateCompose(
@@ -64,9 +62,8 @@ fun FavoritesCompose(
         }
     }
 
-    // CONTENT
     AnimatedVisibility(visible = isContent, enter = fadeIn(), exit = fadeOut()) {
-        val content = state as FavoriteState.Content
+        val content = state as FavoriteState.Content ?: return@AnimatedVisibility
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()

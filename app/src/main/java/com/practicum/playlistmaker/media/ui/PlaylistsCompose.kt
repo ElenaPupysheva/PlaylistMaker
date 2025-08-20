@@ -37,7 +37,6 @@ fun PlaylistsCompose(
             .fillMaxSize()
             .padding(horizontal = dimensionResource(R.dimen.main_padSt))
     ) {
-        // Кнопка
         Button(
             onClick = onCreateNew,
             modifier = Modifier
@@ -56,7 +55,6 @@ fun PlaylistsCompose(
         val isEmpty = state is PlaylistsState.Empty
         val isContent = state is PlaylistsState.Content
 
-        // LOADING
         AnimatedVisibility(visible = isLoading, enter = fadeIn(), exit = fadeOut()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                 CircularProgressIndicator(
@@ -80,9 +78,8 @@ fun PlaylistsCompose(
             }
         }
 
-        // CONTENT
         AnimatedVisibility(visible = isContent, enter = fadeIn(), exit = fadeOut()) {
-            val content = state as PlaylistsState.Content
+            val content = state as? PlaylistsState.Content ?: return@AnimatedVisibility
             LazyVerticalGrid(
                 modifier = Modifier.fillMaxSize(),
                 columns = GridCells.Fixed(2),
