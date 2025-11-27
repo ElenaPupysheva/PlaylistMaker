@@ -1,0 +1,354 @@
+package com.practicum.playlistmaker.search.ui
+
+import android.content.Intent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.google.gson.Gson
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.models.CLICK_DEBOUNCE_DELAY
+import com.practicum.playlistmaker.domain.models.EXTRA_TRACK
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.player.ui.PlayerActivity
+import com.practicum.playlistmaker.search.presentation.SearchError
+import com.practicum.playlistmaker.search.presentation.SearchUiState
+import com.practicum.playlistmaker.search.presentation.SearchViewModel
+import com.practicum.playlistmaker.ui.ErrorStateCompose
+import com.practicum.playlistmaker.ui.ErrorType
+import com.practicum.playlistmaker.ui.TracklistCompose
+import com.practicum.playlistmaker.ui.theme.YsFontFamily
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchCompose(viewModel: SearchViewModel) {
+    val state by viewModel.uiState.observeAsState(SearchUiState())
+    val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val isDark = isSystemInDarkTheme()
+
+    val fieldContainer = if (isDark) Color.White else Color(0xFFE6E8EB)
+    val placeholderColor =
+        if (isDark) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f) else Color(
+            0xFFAEAFB4
+        )
+    val iconTint = if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFFAEAFB4)
+    val inputTextColor = Color(0xFF1A1B22)
+
+    var clickEnabled by remember { mutableStateOf(true) }
+    val openTrack: (Track) -> Unit = remember {
+        { track ->
+            if (clickEnabled) {
+                clickEnabled = false
+                viewModel.onTrackClick(track)
+                ctx.startActivity(
+                    Intent(ctx, PlayerActivity::class.java)
+                        .putExtra(EXTRA_TRACK, Gson().toJson(track))
+                )
+                scope.launch {
+                    delay(CLICK_DEBOUNCE_DELAY)
+                    clickEnabled = true
+                }
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
+                ),
+                title = {
+                    Text(
+                        text = stringResource(R.string.search),
+                        style = MaterialTheme.typography.headlineMedium.copy(fontFamily = YsFontFamily),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets.systemBars
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(dimensionResource(id = R.dimen.size_52dp))
+                    .padding(horizontal = dimensionResource(id = R.dimen.small_icon_pad)),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = fieldContainer,
+                    tonalElevation = 0.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp)
+                ) {}
+                TextField(
+                    value = state.stringValue,
+                    onValueChange = viewModel::onTextChanged,
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { if (it.isFocused) viewModel.onFocusGained() },
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.search),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = placeholderColor,
+                            maxLines = 1
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painterResource(R.drawable.search_bar_icon),
+                            null,
+                            tint = iconTint
+                        )
+                    },
+                    trailingIcon = {
+                        if (state.stringValue.isNotEmpty()) {
+                            IconButton(onClick = {
+                                viewModel.onTextChanged("")
+                                viewModel.onFocusGained()
+                            }) {
+                                Icon(
+                                    painterResource(R.drawable.clear_search),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { viewModel.performSearch(state.stringValue) }),
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = inputTextColor),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        focusedTextColor = inputTextColor,
+                        unfocusedTextColor = inputTextColor,
+                        focusedPlaceholderColor = placeholderColor,
+                        unfocusedPlaceholderColor = placeholderColor,
+                        focusedLeadingIconColor = iconTint,
+                        unfocusedLeadingIconColor = iconTint,
+                        focusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        cursorColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+
+            Spacer(Modifier.height(dimensionResource(id = R.dimen.size_6dp)))
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                val showLoading = state.isLoading
+                val showHistory = state.showHistory
+                val showError = state.error != null
+                val showList = !showLoading && !showHistory && !showError
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showLoading,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(dimensionResource(id = R.dimen.size_44dp))
+                                .align(Alignment.TopCenter)
+                                .padding(top = dimensionResource(id = R.dimen.size_140dp)),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showHistory,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Column(Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(R.string.you_search),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(
+                                top = dimensionResource(id = R.dimen.us_padSt),
+                                bottom = 16.dp
+                            )
+                        ) {
+                            itemsIndexed(
+                                state.historyList,
+                                key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
+                            ) { _, track ->
+                                Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
+                                    TracklistCompose(
+                                        trackName = track.trackName.orEmpty(),
+                                        artistName = track.artistName.orEmpty(),
+                                        trackTime = track.trackTimeMillis.toMmSs(),
+                                        imageUrl = track.artworkUrl100
+                                    )
+                                }
+                            }
+                        }
+                        Button(
+                            onClick = viewModel::clearHistory,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .width(148.dp)
+                                .height(36.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onSecondary,
+                                contentColor = MaterialTheme.colorScheme.secondary
+                            ),
+                            shape = MaterialTheme.shapes.large,
+                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp)
+                        ) {
+                            Text(stringResource(R.string.history_clear), maxLines = 1)
+                        }
+                    }
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showError, enter = fadeIn(), exit = fadeOut()
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        val errorType = when (state.error) {
+                            SearchError.NotFound -> ErrorType.NotFound
+                            SearchError.Network -> ErrorType.Network
+                            else -> ErrorType.NotFound
+                        }
+                        ErrorStateCompose(
+                            type = errorType,
+                            message = when (errorType) {
+                                ErrorType.NotFound -> stringResource(R.string.nothing_found)
+                                ErrorType.Network -> stringResource(R.string.error_net)
+                            },
+                            onRetry = if (errorType == ErrorType.Network) {
+                                {
+                                    val q = state.lastSearchQuery
+                                    if (q.isNotBlank()) viewModel.performSearch(q)
+                                }
+                            } else null,
+                            centerVertically = false,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .padding(top = 102.dp)
+                        )
+                    }
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showList,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            top = dimensionResource(id = R.dimen.us_padSt),
+                            bottom = 16.dp
+                        )
+                    ) {
+                        itemsIndexed(
+                            state.trackList,
+                            key = { _, t -> t.trackId?.toString() ?: t.trackName.orEmpty() }
+                        ) { _, track ->
+                            Surface(onClick = { openTrack(track) }, tonalElevation = 0.dp) {
+                                TracklistCompose(
+                                    trackName = track.trackName.orEmpty(),
+                                    artistName = track.artistName.orEmpty(),
+                                    trackTime = track.trackTimeMillis.toMmSs(),
+                                    imageUrl = track.artworkUrl100
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun Long?.toMmSs(): String {
+    if (this == null || this <= 0L) return "00:00"
+    val total = (this / 1000).toInt()
+    return "%02d:%02d".format(total / 60, total % 60)
+}
